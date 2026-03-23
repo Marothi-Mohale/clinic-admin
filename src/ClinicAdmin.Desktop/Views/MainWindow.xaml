@@ -1,0 +1,40 @@
+<Window x:Class="ClinicAdmin.Desktop.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{Binding Title}"
+        Width="1200"
+        Height="760"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="24" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding Title}" />
+            <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="{Binding Subtitle}" />
+        </StackPanel>
+
+        <Border Grid.Row="2"
+                Padding="24"
+                Background="#F6F8FA"
+                BorderBrush="#D0D7DE"
+                BorderThickness="1"
+                CornerRadius="12">
+            <StackPanel>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Initial Shell" />
+                <TextBlock Margin="0,12,0,0" TextWrapping="Wrap">
+                    This scaffold establishes the solution boundaries and startup composition root.
+                    Next steps are feature modules for login, patient search, registration, duplicate detection,
+                    and file tracking.
+                </TextBlock>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+

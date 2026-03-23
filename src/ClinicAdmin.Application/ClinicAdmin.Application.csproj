@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\ClinicAdmin.Contracts\ClinicAdmin.Contracts.csproj" />
+    <ProjectReference Include="..\ClinicAdmin.Domain\ClinicAdmin.Domain.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.13" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+</Project>
+
