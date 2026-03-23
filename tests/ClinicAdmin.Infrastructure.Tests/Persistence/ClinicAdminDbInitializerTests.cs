@@ -34,6 +34,25 @@ public sealed class ClinicAdminDbInitializerTests
         Assert.Contains(dbContext.Users, x => x.Role == UserRole.Admin);
     }
 
+    [Fact]
+    public async Task InitializeAsync_WithSqliteProvider_ShouldCreateSchemaAndRespectSeedingFlag()
+    {
+        await using var connection = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+
+        var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()
+            .UseSqlite(connection)
+            .Options;
+
+        await using var dbContext = new ClinicAdminDbContext(options);
+        var initializer = CreateInitializer(dbContext, seedDefaultUsers: false);
+
+        await initializer.InitializeAsync();
+
+        Assert.True(await dbContext.Database.CanConnectAsync());
+        Assert.Empty(dbContext.Users);
+    }
+
     private static ClinicAdminDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()

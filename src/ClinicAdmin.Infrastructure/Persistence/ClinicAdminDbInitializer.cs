@@ -30,7 +30,7 @@ public sealed class ClinicAdminDbInitializer
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        await _dbContext.Database.EnsureCreatedAsync(cancellationToken);
+        await InitializeDatabaseAsync(cancellationToken);
 
         if (!_seedingOptions.SeedDefaultUsers)
         {
@@ -68,5 +68,27 @@ public sealed class ClinicAdminDbInitializer
             passwordHash.Hash,
             passwordHash.Salt,
             role);
+    }
+
+    private async Task InitializeDatabaseAsync(CancellationToken cancellationToken)
+    {
+        if (_dbContext.Database.IsSqlite() || _dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            await _dbContext.Database.EnsureCreatedAsync(cancellationToken);
+            return;
+        }
+
+        var pendingMigrations = await _dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
+        if (!pendingMigrations.Any())
+        {
+            var availableMigrations = await _dbContext.Database.GetMigrationsAsync(cancellationToken);
+            if (!availableMigrations.Any())
+            {
+                throw new InvalidOperationException(
+                    "Production database initialization requires EF Core migrations. Create and apply the initial migration set before starting the application in a relational production environment.");
+            }
+        }
+
+        await _dbContext.Database.MigrateAsync(cancellationToken);
     }
 }
