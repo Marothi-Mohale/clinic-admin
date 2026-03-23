@@ -3,38 +3,172 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:ClinicAdmin.Desktop.Converters"
         mc:Ignorable="d"
         Title="{Binding Title}"
         Width="1200"
         Height="760"
+        MinWidth="960"
+        MinHeight="640"
+        Background="#F3F5F7"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="24" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid Visibility="{Binding IsLoginVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
 
-        <StackPanel>
-            <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding Title}" />
-            <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="{Binding Subtitle}" />
-        </StackPanel>
+            <Border Margin="24"
+                    Padding="40"
+                    Background="#15354B"
+                    CornerRadius="24">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock FontSize="34" FontWeight="SemiBold" Foreground="White" Text="{Binding Title}" />
+                    <TextBlock Margin="0,16,0,0"
+                               FontSize="16"
+                               Foreground="#D6E3EA"
+                               TextWrapping="Wrap"
+                               Text="{Binding Subtitle}" />
+                    <Border Margin="0,28,0,0"
+                            Padding="20"
+                            Background="#214B66"
+                            CornerRadius="16">
+                        <StackPanel>
+                            <TextBlock FontSize="15" FontWeight="SemiBold" Foreground="White" Text="Phase 1 access" />
+                            <TextBlock Margin="0,10,0,0" Foreground="#D6E3EA" Text="Seeded users for local development:" />
+                            <TextBlock Margin="0,10,0,0" Foreground="White" Text="admin / Admin@123" />
+                            <TextBlock Foreground="White" Text="reception / Reception@123" />
+                            <TextBlock Foreground="White" Text="nurse / Nurse@123" />
+                            <TextBlock Foreground="White" Text="doctor / Doctor@123" />
+                            <TextBlock Foreground="White" Text="manager / Manager@123" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
 
-        <Border Grid.Row="2"
-                Padding="24"
-                Background="#F6F8FA"
-                BorderBrush="#D0D7DE"
-                BorderThickness="1"
-                CornerRadius="12">
-            <StackPanel>
-                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Initial Shell" />
-                <TextBlock Margin="0,12,0,0" TextWrapping="Wrap">
-                    This scaffold establishes the solution boundaries and startup composition root.
-                    Next steps are feature modules for login, patient search, registration, duplicate detection,
-                    and file tracking.
-                </TextBlock>
-            </StackPanel>
-        </Border>
+            <Grid Grid.Column="1" Margin="24">
+                <Border Padding="36"
+                        Background="White"
+                        BorderBrush="#D8DEE4"
+                        BorderThickness="1"
+                        CornerRadius="24"
+                        VerticalAlignment="Center">
+                    <StackPanel>
+                        <TextBlock FontSize="28" FontWeight="SemiBold" Text="Sign in" />
+                        <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="Secure access for clinic staff" />
+
+                        <TextBlock Margin="0,24,0,6" FontWeight="SemiBold" Text="Username" />
+                        <TextBox Height="38"
+                                 Padding="10,6"
+                                 Text="{Binding Login.Username, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Margin="0,16,0,6" FontWeight="SemiBold" Text="Password" />
+                        <PasswordBox x:Name="PasswordInput"
+                                     Height="38"
+                                     Padding="10,6"
+                                     PasswordChanged="PasswordInput_OnPasswordChanged" />
+
+                        <Border Margin="0,16,0,0"
+                                Padding="10"
+                                Background="#FFF5F5"
+                                BorderBrush="#E7B4B4"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Visibility="{Binding Login.ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+                            <TextBlock Foreground="#A1260D" Text="{Binding Login.ErrorMessage}" TextWrapping="Wrap" />
+                        </Border>
+
+                        <Button Margin="0,24,0,0"
+                                Height="42"
+                                Background="#0E7490"
+                                Foreground="White"
+                                BorderBrush="#0E7490"
+                                Command="{Binding Login.LoginCommand}"
+                                Content="Sign in" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Grid Visibility="{Binding IsShellVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Background="#123247">
+                <DockPanel Margin="20">
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock FontSize="24" FontWeight="SemiBold" Foreground="White" Text="{Binding Title}" />
+                        <TextBlock Margin="0,8,0,0" Foreground="#D6E3EA" Text="{Binding CurrentUserDisplayName}" />
+                        <TextBlock Foreground="#9BC3D6" Text="{Binding CurrentRole}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,28,0,0">
+                        <TextBlock Margin="0,0,0,8" FontWeight="SemiBold" Foreground="#9BC3D6" Text="Navigation" />
+                        <ListBox ItemsSource="{Binding NavigationItems}"
+                                 SelectedValue="{Binding SelectedRoute, Mode=TwoWay}"
+                                 SelectedValuePath="Route"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="White">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,6,0,0" Padding="12" Background="#1D4C67" CornerRadius="10">
+                                        <StackPanel>
+                                            <TextBlock FontWeight="SemiBold" Text="{Binding Title}" />
+                                            <TextBlock Margin="0,4,0,0"
+                                                       FontSize="12"
+                                                       Foreground="#D6E3EA"
+                                                       Text="{Binding Description}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <Button DockPanel.Dock="Bottom"
+                            Margin="0,24,0,0"
+                            Height="40"
+                            Background="#E2E8F0"
+                            BorderBrush="#E2E8F0"
+                            Command="{Binding LogoutCommand}"
+                            Content="Sign out" />
+                </DockPanel>
+            </Border>
+
+            <Grid Grid.Column="1" Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel>
+                    <TextBlock FontSize="30" FontWeight="SemiBold" Text="{Binding SelectedRoute}" />
+                    <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="{Binding CurrentRouteDescription}" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Grid.Row="2"
+                        Padding="28"
+                        Background="White"
+                        BorderBrush="#D8DEE4"
+                        BorderThickness="1"
+                        CornerRadius="20">
+                    <StackPanel>
+                        <TextBlock FontSize="20" FontWeight="SemiBold" Text="Authorized workspace" />
+                        <TextBlock Margin="0,14,0,0" Foreground="#4B5563" TextWrapping="Wrap">
+                            Authentication and role-based navigation are now active. The next implementation slices will replace this shell panel with patient registration, search, visits, audit, and reporting modules.
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
-

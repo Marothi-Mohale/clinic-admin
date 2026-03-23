@@ -2,6 +2,7 @@ using ClinicAdmin.Application;
 using ClinicAdmin.Desktop.ViewModels;
 using ClinicAdmin.Desktop.Views;
 using ClinicAdmin.Infrastructure;
+using ClinicAdmin.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +13,7 @@ namespace ClinicAdmin.Desktop;
 public partial class App : System.Windows.Application
 {
     private readonly IHost _host;
+    private IServiceScope? _uiScope;
 
     public App()
     {
@@ -34,25 +36,48 @@ public partial class App : System.Windows.Application
             {
                 services.AddApplication();
                 services.AddInfrastructure(context.Configuration);
-                services.AddSingleton<MainWindowViewModel>();
-                services.AddSingleton<MainWindow>();
+                services.AddScoped<LoginViewModel>();
+                services.AddScoped<MainWindowViewModel>();
+                services.AddScoped<MainWindow>();
             })
             .Build();
     }
 
     protected override async void OnStartup(System.Windows.StartupEventArgs e)
     {
-        await _host.StartAsync();
+        try
+        {
+            await _host.StartAsync();
 
-        var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-        MainWindow = mainWindow;
-        mainWindow.Show();
+            using (var scope = _host.Services.CreateScope())
+            {
+                var initializer = scope.ServiceProvider.GetRequiredService<ClinicAdminDbInitializer>();
+                await initializer.InitializeAsync();
+            }
+
+            _uiScope = _host.Services.CreateScope();
+            var mainWindow = _uiScope.ServiceProvider.GetRequiredService<MainWindow>();
+            MainWindow = mainWindow;
+            mainWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(
+                $"The application could not start correctly.\n\n{ex.Message}",
+                "Clinic Administration",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error);
+
+            Shutdown(-1);
+            return;
+        }
 
         base.OnStartup(e);
     }
 
     protected override async void OnExit(System.Windows.ExitEventArgs e)
     {
+        _uiScope?.Dispose();
         await _host.StopAsync();
         _host.Dispose();
         base.OnExit(e);

@@ -8,7 +8,6 @@ using ClinicAdmin.Infrastructure.Sync;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace ClinicAdmin.Infrastructure;
 
@@ -39,9 +38,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ClinicAdminDbContext>());
         services.AddScoped<IAuditService, AuditService>();
         services.AddSingleton<IClock, SystemClock>();
-        services.AddSingleton<ICurrentUserService, DesktopCurrentUserService>();
+        services.AddSingleton<UserSessionService>();
+        services.AddSingleton<ICurrentUserService>(sp => sp.GetRequiredService<UserSessionService>());
+        services.AddSingleton<IUserSessionService>(sp => sp.GetRequiredService<UserSessionService>());
         services.AddSingleton<IFacilityContext, DesktopFacilityContext>();
+        services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ISyncJournal, SyncJournalService>();
+        services.AddScoped<ClinicAdminDbInitializer>();
 
         return services;
     }

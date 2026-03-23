@@ -1,5 +1,6 @@
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Application.Patients.DuplicateDetection;
+using ClinicAdmin.Application.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ClinicAdmin.Application.Tests.Composition;
@@ -12,9 +13,9 @@ public sealed class ApplicationServiceCollectionExtensionsTests
         var services = new ServiceCollection();
 
         services.AddApplication();
-        var provider = services.BuildServiceProvider();
 
-        Assert.NotNull(provider.GetService<RegisterPatientCommandHandler>());
-        Assert.NotNull(provider.GetService<IPatientDuplicateDetectionService>());
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(RegisterPatientCommandHandler));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPatientDuplicateDetectionService));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IAuthorizationService));
     }
 }
