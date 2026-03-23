@@ -3,6 +3,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
@@ -10,5 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ClinicAdmin.Application\ClinicAdmin.Application.csproj" />
+    <ProjectReference Include="..\..\src\ClinicAdmin.Domain\ClinicAdmin.Domain.csproj" />
+    <ProjectReference Include="..\..\src\ClinicAdmin.Infrastructure\ClinicAdmin.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

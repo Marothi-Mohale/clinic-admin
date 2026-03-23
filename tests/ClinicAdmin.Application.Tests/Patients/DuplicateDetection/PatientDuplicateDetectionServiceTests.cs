@@ -21,7 +21,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "Nomsa", "Dlamini", new DateOnly(1988, 4, 2), "8804021234088", null, "0821234567")
+            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "P-100", "Nomsa", "Dlamini", new DateOnly(1988, 4, 2), "8804021234088", null, "0821234567")
         };
 
         var result = _service.Detect(request, candidates);
@@ -45,7 +45,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "Ameena", "Khan", new DateOnly(1993, 10, 12), null, "P1234567", null)
+            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "P-101", "Ameena", "Khan", new DateOnly(1993, 10, 12), null, "P1234567", null)
         };
 
         var result = _service.Detect(request, candidates);
@@ -68,7 +68,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "Sipho", "Nkosi", new DateOnly(1997, 7, 9), null, null, "0821234567")
+            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "P-102", "Sipho", "Nkosi", new DateOnly(1997, 7, 9), null, null, "0821234567")
         };
 
         var result = _service.Detect(request, candidates);
@@ -92,7 +92,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "Nokutula", "Maseko", new DateOnly(1985, 1, 5), null, null, null)
+            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "P-103", "Nokutula", "Maseko", new DateOnly(1985, 1, 5), null, null, null)
         };
 
         var result = _service.Detect(request, candidates);
@@ -116,7 +116,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "Peter", "Mokoena", new DateOnly(1975, 2, 1), null, null, null)
+            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "P-104", "Peter", "Mokoena", new DateOnly(1975, 2, 1), null, null, null)
         };
 
         var result = _service.Detect(request, candidates);
@@ -139,7 +139,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "Ayanda", "Zulu", null, null, null, null)
+            new DuplicatePatientCandidate(Guid.NewGuid(), _facilityId, "P-105", "Ayanda", "Zulu", null, null, null, null)
         };
 
         var result = _service.Detect(request, candidates);
@@ -163,7 +163,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         var candidates = new[]
         {
-            new DuplicatePatientCandidate(Guid.NewGuid(), Guid.NewGuid(), "Lerato", "Molefe", new DateOnly(1994, 12, 11), "9412111234085", null, null)
+            new DuplicatePatientCandidate(Guid.NewGuid(), Guid.NewGuid(), "P-106", "Lerato", "Molefe", new DateOnly(1994, 12, 11), "9412111234085", null, null)
         };
 
         var result = _service.Detect(request, candidates);

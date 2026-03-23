@@ -37,6 +37,7 @@ public partial class App : System.Windows.Application
                 services.AddApplication();
                 services.AddInfrastructure(context.Configuration);
                 services.AddScoped<LoginViewModel>();
+                services.AddScoped<PatientRegistrationViewModel>();
                 services.AddScoped<MainWindowViewModel>();
                 services.AddScoped<MainWindow>();
             })

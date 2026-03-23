@@ -11,21 +11,25 @@ public sealed class MainWindowViewModel : ViewModelBase
     private readonly IUserSessionService _userSessionService;
     private readonly IAuthenticationService _authenticationService;
     private readonly IAuthorizationService _authorizationService;
+    private readonly PatientRegistrationViewModel _patientRegistrationViewModel;
     private bool _isAuthenticated;
     private string _currentUserDisplayName = "Not signed in";
     private string _currentRole = "Guest";
     private string _selectedRoute = "Dashboard";
+    private object? _currentWorkspaceViewModel;
 
     public MainWindowViewModel(
         LoginViewModel login,
         IUserSessionService userSessionService,
         IAuthenticationService authenticationService,
-        IAuthorizationService authorizationService)
+        IAuthorizationService authorizationService,
+        PatientRegistrationViewModel patientRegistrationViewModel)
     {
         Login = login;
         _userSessionService = userSessionService;
         _authenticationService = authenticationService;
         _authorizationService = authorizationService;
+        _patientRegistrationViewModel = patientRegistrationViewModel;
         NavigationItems = new ObservableCollection<NavigationItemViewModel>();
         LogoutCommand = new AsyncRelayCommand(LogoutAsync, () => IsAuthenticated);
 
@@ -81,6 +85,7 @@ public sealed class MainWindowViewModel : ViewModelBase
             if (SetProperty(ref _selectedRoute, value))
             {
                 RaisePropertyChanged(nameof(CurrentRouteDescription));
+                UpdateWorkspace();
             }
         }
     }
@@ -88,6 +93,12 @@ public sealed class MainWindowViewModel : ViewModelBase
     public string CurrentRouteDescription =>
         NavigationItems.FirstOrDefault(x => x.Route == SelectedRoute)?.Description ??
         "Choose a task from the navigation menu.";
+
+    public object? CurrentWorkspaceViewModel
+    {
+        get => _currentWorkspaceViewModel;
+        private set => SetProperty(ref _currentWorkspaceViewModel, value);
+    }
 
     private async Task LogoutAsync()
     {
@@ -113,6 +124,7 @@ public sealed class MainWindowViewModel : ViewModelBase
         {
             SelectedRoute = "Dashboard";
             RaisePropertyChanged(nameof(CurrentRouteDescription));
+            CurrentWorkspaceViewModel = new WorkspacePlaceholderViewModel("Waiting for sign in", "Sign in to access clinic administration tasks.");
             return;
         }
 
@@ -126,6 +138,7 @@ public sealed class MainWindowViewModel : ViewModelBase
 
         SelectedRoute = NavigationItems.FirstOrDefault()?.Route ?? "Dashboard";
         RaisePropertyChanged(nameof(CurrentRouteDescription));
+        UpdateWorkspace();
     }
 
     private static IReadOnlyCollection<NavigationItemViewModel> BuildNavigation(UserRole role) =>
@@ -166,4 +179,16 @@ public sealed class MainWindowViewModel : ViewModelBase
             },
             _ => Array.Empty<NavigationItemViewModel>()
         };
+
+    private void UpdateWorkspace()
+    {
+        var currentRole = _userSessionService.CurrentSession?.Role;
+        CurrentWorkspaceViewModel = SelectedRoute switch
+        {
+            "Patients" when currentRole is UserRole.Admin or UserRole.Receptionist => _patientRegistrationViewModel,
+            _ => new WorkspacePlaceholderViewModel(
+                SelectedRoute,
+                "This workspace will be implemented in the next module. Authentication and route access are already enforced.")
+        };
+    }
 }

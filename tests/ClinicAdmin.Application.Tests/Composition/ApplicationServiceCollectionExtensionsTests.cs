@@ -17,5 +17,6 @@ public sealed class ApplicationServiceCollectionExtensionsTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(RegisterPatientCommandHandler));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPatientDuplicateDetectionService));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IAuthorizationService));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPatientRegistrationService));
     }
 }

@@ -1,8 +1,10 @@
 using ClinicAdmin.Application.Abstractions;
 using ClinicAdmin.Application.Authentication;
 using ClinicAdmin.Application.Authorization;
+using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Desktop.ViewModels;
 using ClinicAdmin.Domain.Security;
+using ClinicAdmin.Domain.Patients;
 
 namespace ClinicAdmin.Desktop.Tests.ViewModels;
 
@@ -24,11 +26,33 @@ public sealed class MainWindowViewModelTests
             new LoginViewModel(new FakeAuthenticationService(sessionService)),
             sessionService,
             new FakeAuthenticationService(sessionService),
-            new AuthorizationService());
+            new AuthorizationService(),
+            new PatientRegistrationViewModel(
+                new FakePatientRegistrationService(),
+                new FakeDuplicateWarningService(),
+                new FakeFacilityContext()));
 
         Assert.True(viewModel.IsAuthenticated);
         Assert.Contains(viewModel.NavigationItems, item => item.Route == "Reports");
         Assert.DoesNotContain(viewModel.NavigationItems, item => item.Route == "Administration");
+    }
+
+    private sealed class FakePatientRegistrationService : IPatientRegistrationService
+    {
+        public Task<RegisterPatientCommandResult> RegisterAsync(RegisterPatientCommand command, CancellationToken cancellationToken = default) =>
+            Task.FromResult(RegisterPatientCommandResult.Success(Guid.NewGuid(), command.PatientNumber));
+    }
+
+    private sealed class FakeDuplicateWarningService : IPatientRegistrationDuplicateWarningService
+    {
+        public Task<DuplicateWarningResult> CheckAsync(RegisterPatientCommand command, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new DuplicateWarningResult(ClinicAdmin.Application.Patients.DuplicateDetection.DuplicateActionRecommendation.SafeToCreate, Array.Empty<ClinicAdmin.Contracts.Patients.DuplicatePatientWarningDto>()));
+    }
+
+    private sealed class FakeFacilityContext : IFacilityContext
+    {
+        public Guid CurrentFacilityId => Guid.Parse("11111111-1111-1111-1111-111111111111");
+        public string FacilityCode => "MAIN";
     }
 
     private sealed class FakeAuthenticationService : IAuthenticationService

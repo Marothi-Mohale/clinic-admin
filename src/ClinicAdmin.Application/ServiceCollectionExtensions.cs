@@ -15,6 +15,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
         services.AddScoped<IValidator<RegisterPatientCommand>, RegisterPatientCommandValidator>();
+        services.AddScoped<IPatientRegistrationDuplicateQueryService, PatientRegistrationDuplicateQueryService>();
+        services.AddScoped<IPatientRegistrationDuplicateWarningService, PatientRegistrationDuplicateWarningService>();
+        services.AddScoped<IPatientRegistrationService, RegisterPatientCommandHandler>();
         services.AddScoped<RegisterPatientCommandHandler>();
         services.AddSingleton<IPatientDuplicateDetectionService, PatientDuplicateDetectionService>();
 
