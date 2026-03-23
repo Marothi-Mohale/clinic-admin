@@ -30,6 +30,11 @@ public sealed class RegisterPatientCommandValidator : IValidator<RegisterPatient
             errors.Add(new ValidationError(nameof(instance.NationalIdNumber), "National ID number is too long."));
         }
 
+        if (instance.PassportNumber is { Length: > 20 })
+        {
+            errors.Add(new ValidationError(nameof(instance.PassportNumber), "Passport number is too long."));
+        }
+
         if (instance.PhoneNumber is { Length: > 50 })
         {
             errors.Add(new ValidationError(nameof(instance.PhoneNumber), "Phone number is too long."));

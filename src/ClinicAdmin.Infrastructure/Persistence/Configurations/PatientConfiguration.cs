@@ -13,9 +13,10 @@ public sealed class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.Property(x => x.FirstName).HasMaxLength(100).IsRequired();
         builder.Property(x => x.LastName).HasMaxLength(100).IsRequired();
         builder.Property(x => x.NationalIdNumber).HasMaxLength(20);
+        builder.Property(x => x.PassportNumber).HasMaxLength(20);
         builder.Property(x => x.PhoneNumber).HasMaxLength(20);
         builder.HasIndex(x => new { x.FacilityId, x.LastName, x.FirstName });
         builder.HasIndex(x => new { x.FacilityId, x.NationalIdNumber });
+        builder.HasIndex(x => new { x.FacilityId, x.PassportNumber });
     }
 }
-

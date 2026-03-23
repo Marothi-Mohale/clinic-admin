@@ -8,6 +8,7 @@ public sealed class Patient : Entity
     public string LastName { get; private set; }
     public DateOnly? DateOfBirth { get; private set; }
     public string? NationalIdNumber { get; private set; }
+    public string? PassportNumber { get; private set; }
     public string? PhoneNumber { get; private set; }
     public Guid FacilityId { get; private set; }
 
@@ -17,6 +18,7 @@ public sealed class Patient : Entity
         string lastName,
         DateOnly? dateOfBirth,
         string? nationalIdNumber,
+        string? passportNumber,
         string? phoneNumber)
     {
         FacilityId = facilityId;
@@ -24,15 +26,23 @@ public sealed class Patient : Entity
         LastName = GuardRequired(lastName, nameof(lastName));
         DateOfBirth = dateOfBirth;
         NationalIdNumber = Normalize(nationalIdNumber);
+        PassportNumber = Normalize(passportNumber);
         PhoneNumber = Normalize(phoneNumber);
     }
 
-    public void UpdateDemographics(string firstName, string lastName, DateOnly? dateOfBirth, string? nationalIdNumber, string? phoneNumber)
+    public void UpdateDemographics(
+        string firstName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        string? nationalIdNumber,
+        string? passportNumber,
+        string? phoneNumber)
     {
         FirstName = GuardRequired(firstName, nameof(firstName));
         LastName = GuardRequired(lastName, nameof(lastName));
         DateOfBirth = dateOfBirth;
         NationalIdNumber = Normalize(nationalIdNumber);
+        PassportNumber = Normalize(passportNumber);
         PhoneNumber = Normalize(phoneNumber);
     }
 
@@ -49,4 +59,3 @@ public sealed class Patient : Entity
     private static string? Normalize(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }
-

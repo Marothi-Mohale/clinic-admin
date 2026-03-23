@@ -33,6 +33,7 @@ public sealed class RegisterPatientCommandHandler
             command.LastName,
             command.DateOfBirth,
             command.NationalIdNumber,
+            command.PassportNumber,
             command.PhoneNumber);
 
         _dbContext.Patients.Add(patient);

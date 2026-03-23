@@ -1,6 +1,7 @@
-namespace ClinicAdmin.Application.Patients.Commands.RegisterPatient;
+namespace ClinicAdmin.Application.Patients.DuplicateDetection;
 
-public sealed record RegisterPatientCommand(
+public sealed record DuplicatePatientCandidate(
+    Guid PatientId,
     Guid FacilityId,
     string FirstName,
     string LastName,
@@ -8,3 +9,4 @@ public sealed record RegisterPatientCommand(
     string? NationalIdNumber,
     string? PassportNumber,
     string? PhoneNumber);
+

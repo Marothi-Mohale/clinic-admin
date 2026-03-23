@@ -6,7 +6,7 @@ public sealed record PatientSummaryDto(
     string LastName,
     DateOnly? DateOfBirth,
     string? NationalIdNumber,
+    string? PassportNumber,
     string? PhoneNumber,
     string? FileNumber,
     string? FileStatus);
-

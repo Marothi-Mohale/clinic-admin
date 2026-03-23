@@ -9,7 +9,7 @@ public sealed class RegisterPatientCommandValidatorTests
     public async Task ValidateAsync_WhenNamesAreMissing_ReturnsErrors()
     {
         var validator = new RegisterPatientCommandValidator();
-        var command = new RegisterPatientCommand(Guid.Empty, string.Empty, string.Empty, null, null, null);
+        var command = new RegisterPatientCommand(Guid.Empty, string.Empty, string.Empty, null, null, null, null);
 
         var errors = await validator.ValidateAsync(command);
 
