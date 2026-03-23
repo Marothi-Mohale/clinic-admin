@@ -144,6 +144,24 @@ public sealed class PatientSearchService : IPatientSearchService
             .Select(x => new PatientHistoryItemDto(x.OccurredAtUtc, x.Action, x.Details, x.Succeeded))
             .ToListAsync(cancellationToken);
 
+        var visitHistory = await _dbContext.Visits
+            .AsNoTracking()
+            .Where(x => x.FacilityId == facilityId && x.PatientId == patientId)
+            .OrderByDescending(x => x.ArrivedAtUtc)
+            .Take(5)
+            .Select(x => new PatientHistoryItemDto(
+                x.ArrivedAtUtc,
+                "Visit",
+                $"{x.ReasonForVisit} | {x.State} | {x.QueueStatus}",
+                true))
+            .ToListAsync(cancellationToken);
+
+        var combinedHistory = history
+            .Concat(visitHistory)
+            .OrderByDescending(x => x.OccurredAtUtc)
+            .Take(8)
+            .ToArray();
+
         return new PatientProfileDto(
             patient.Id,
             patient.PatientNumber,
@@ -164,7 +182,7 @@ public sealed class PatientSearchService : IPatientSearchService
             file?.FileNumber,
             file?.FileStatus,
             file?.CurrentLocation,
-            history);
+            combinedHistory);
     }
 
     private static string? NormalizePhoneSearchTerm(string digits)

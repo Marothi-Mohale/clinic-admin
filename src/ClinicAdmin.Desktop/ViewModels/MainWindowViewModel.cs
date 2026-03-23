@@ -13,6 +13,7 @@ public sealed class MainWindowViewModel : ViewModelBase
     private readonly IAuthorizationService _authorizationService;
     private readonly PatientRegistrationViewModel _patientRegistrationViewModel;
     private readonly PatientSearchViewModel _patientSearchViewModel;
+    private readonly VisitCaptureViewModel _visitCaptureViewModel;
     private bool _isAuthenticated;
     private string _currentUserDisplayName = "Not signed in";
     private string _currentRole = "Guest";
@@ -25,7 +26,8 @@ public sealed class MainWindowViewModel : ViewModelBase
         IAuthenticationService authenticationService,
         IAuthorizationService authorizationService,
         PatientRegistrationViewModel patientRegistrationViewModel,
-        PatientSearchViewModel patientSearchViewModel)
+        PatientSearchViewModel patientSearchViewModel,
+        VisitCaptureViewModel visitCaptureViewModel)
     {
         Login = login;
         _userSessionService = userSessionService;
@@ -33,6 +35,7 @@ public sealed class MainWindowViewModel : ViewModelBase
         _authorizationService = authorizationService;
         _patientRegistrationViewModel = patientRegistrationViewModel;
         _patientSearchViewModel = patientSearchViewModel;
+        _visitCaptureViewModel = visitCaptureViewModel;
         NavigationItems = new ObservableCollection<NavigationItemViewModel>();
         LogoutCommand = new AsyncRelayCommand(LogoutAsync, () => IsAuthenticated);
 
@@ -192,6 +195,7 @@ public sealed class MainWindowViewModel : ViewModelBase
         {
             "Patients" => _patientSearchViewModel,
             "Register" when currentRole is UserRole.Admin or UserRole.Receptionist => _patientRegistrationViewModel,
+            "Visits" => _visitCaptureViewModel,
             _ => new WorkspacePlaceholderViewModel(
                 SelectedRoute,
                 "This workspace will be implemented in the next module. Authentication and route access are already enforced.")

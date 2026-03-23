@@ -4,6 +4,8 @@ using ClinicAdmin.Application.Authorization;
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Application.Patients.Queries.SearchPatients;
 using ClinicAdmin.Contracts.Patients;
+using ClinicAdmin.Application.Visits.Commands.RegisterVisit;
+using ClinicAdmin.Contracts.Visits;
 using ClinicAdmin.Desktop.ViewModels;
 using ClinicAdmin.Domain.Security;
 using ClinicAdmin.Domain.Patients;
@@ -35,6 +37,10 @@ public sealed class MainWindowViewModelTests
                 new FakeFacilityContext()),
             new PatientSearchViewModel(
                 new FakePatientSearchService(),
+                new FakeFacilityContext()),
+            new VisitCaptureViewModel(
+                new FakePatientSearchService(),
+                new FakeVisitWorkflowService(),
                 new FakeFacilityContext()));
 
         Assert.True(viewModel.IsAuthenticated);
@@ -61,6 +67,18 @@ public sealed class MainWindowViewModelTests
 
         public Task<IReadOnlyCollection<PatientSearchResultDto>> SearchAsync(SearchPatientsQuery query, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyCollection<PatientSearchResultDto>>(Array.Empty<PatientSearchResultDto>());
+    }
+
+    private sealed class FakeVisitWorkflowService : IVisitWorkflowService
+    {
+        public Task<IReadOnlyCollection<VisitHistoryItemDto>> GetVisitHistoryAsync(Guid facilityId, Guid patientId, int take = 20, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyCollection<VisitHistoryItemDto>>(Array.Empty<VisitHistoryItemDto>());
+
+        public Task<VisitSummaryDto> RegisterArrivalAsync(RegisterVisitCommand command, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new VisitSummaryDto(Guid.NewGuid(), command.PatientId, "P-100", "Patient", DateTimeOffset.UtcNow, command.ReasonForVisit, command.QueueStatus.ToString(), command.State.ToString(), command.Department, command.AssignedStaffMember, command.Notes ?? string.Empty));
+
+        public Task<VisitSummaryDto> UpdateVisitAsync(UpdateVisitStateCommand command, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new VisitSummaryDto(command.VisitId, Guid.NewGuid(), "P-100", "Patient", DateTimeOffset.UtcNow, "Review", command.QueueStatus.ToString(), command.State.ToString(), command.Department, command.AssignedStaffMember, command.Notes ?? string.Empty));
     }
 
     private sealed class FakeFacilityContext : IFacilityContext

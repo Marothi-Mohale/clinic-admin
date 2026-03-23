@@ -2,6 +2,7 @@ using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Application.Patients.DuplicateDetection;
 using ClinicAdmin.Application.Patients.Queries.SearchPatients;
 using ClinicAdmin.Application.Abstractions;
+using ClinicAdmin.Application.Visits.Commands.RegisterVisit;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ClinicAdmin.Application.Tests.Composition;
@@ -20,5 +21,6 @@ public sealed class ApplicationServiceCollectionExtensionsTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IAuthorizationService));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPatientRegistrationService));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IPatientSearchService));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IVisitWorkflowService));
     }
 }

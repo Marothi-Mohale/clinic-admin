@@ -3,6 +3,7 @@ using ClinicAdmin.Domain.Auditing;
 using ClinicAdmin.Domain.Files;
 using ClinicAdmin.Domain.Patients;
 using ClinicAdmin.Domain.Security;
+using ClinicAdmin.Domain.Visits;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicAdmin.Infrastructure.Persistence;
@@ -18,6 +19,7 @@ public sealed class ClinicAdminDbContext : DbContext, IApplicationDbContext
     public DbSet<FileRecord> Files => Set<FileRecord>();
     public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<PatientVisit> Visits => Set<PatientVisit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

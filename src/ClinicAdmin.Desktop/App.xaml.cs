@@ -39,6 +39,7 @@ public partial class App : System.Windows.Application
                 services.AddScoped<LoginViewModel>();
                 services.AddScoped<PatientSearchViewModel>();
                 services.AddScoped<PatientRegistrationViewModel>();
+                services.AddScoped<VisitCaptureViewModel>();
                 services.AddScoped<MainWindowViewModel>();
                 services.AddScoped<MainWindow>();
             })
