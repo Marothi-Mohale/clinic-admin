@@ -4,6 +4,7 @@ using ClinicAdmin.Application.Authorization;
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Application.Patients.DuplicateDetection;
 using ClinicAdmin.Application.Patients.Queries.SearchPatients;
+using ClinicAdmin.Application.Reports.Queries;
 using ClinicAdmin.Application.Visits.Commands.RegisterVisit;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPatientRegistrationDuplicateWarningService, PatientRegistrationDuplicateWarningService>();
         services.AddScoped<IPatientRegistrationService, RegisterPatientCommandHandler>();
         services.AddScoped<IPatientSearchService, PatientSearchService>();
+        services.AddScoped<IReportingService, ReportingService>();
         services.AddScoped<IVisitWorkflowService, VisitWorkflowService>();
         services.AddScoped<RegisterPatientCommandHandler>();
         services.AddSingleton<IPatientDuplicateDetectionService, PatientDuplicateDetectionService>();

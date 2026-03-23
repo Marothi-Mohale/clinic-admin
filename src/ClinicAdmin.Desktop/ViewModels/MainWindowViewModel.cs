@@ -15,6 +15,7 @@ public sealed class MainWindowViewModel : ViewModelBase
     private readonly PatientSearchViewModel _patientSearchViewModel;
     private readonly VisitCaptureViewModel _visitCaptureViewModel;
     private readonly AuditLogViewModel _auditLogViewModel;
+    private readonly ReportsViewModel _reportsViewModel;
     private bool _isAuthenticated;
     private string _currentUserDisplayName = "Not signed in";
     private string _currentRole = "Guest";
@@ -29,7 +30,8 @@ public sealed class MainWindowViewModel : ViewModelBase
         PatientRegistrationViewModel patientRegistrationViewModel,
         PatientSearchViewModel patientSearchViewModel,
         VisitCaptureViewModel visitCaptureViewModel,
-        AuditLogViewModel auditLogViewModel)
+        AuditLogViewModel auditLogViewModel,
+        ReportsViewModel reportsViewModel)
     {
         Login = login;
         _userSessionService = userSessionService;
@@ -39,6 +41,7 @@ public sealed class MainWindowViewModel : ViewModelBase
         _patientSearchViewModel = patientSearchViewModel;
         _visitCaptureViewModel = visitCaptureViewModel;
         _auditLogViewModel = auditLogViewModel;
+        _reportsViewModel = reportsViewModel;
         NavigationItems = new ObservableCollection<NavigationItemViewModel>();
         LogoutCommand = new AsyncRelayCommand(LogoutAsync, () => IsAuthenticated);
 
@@ -200,11 +203,17 @@ public sealed class MainWindowViewModel : ViewModelBase
             "Patients" => _patientSearchViewModel,
             "Register" when currentRole is UserRole.Admin or UserRole.Receptionist => _patientRegistrationViewModel,
             "Visits" => _visitCaptureViewModel,
+            "Reports" when currentRole is UserRole.Admin or UserRole.Manager => _reportsViewModel,
             "Audit" when currentRole is UserRole.Admin or UserRole.Manager => _auditLogViewModel,
             _ => new WorkspacePlaceholderViewModel(
                 SelectedRoute,
                 "This workspace will be implemented in the next module. Authentication and route access are already enforced.")
         };
+
+        if (SelectedRoute == "Reports" && CurrentWorkspaceViewModel is ReportsViewModel reportsViewModel)
+        {
+            _ = reportsViewModel.InitializeAsync();
+        }
 
         if (SelectedRoute == "Audit" && CurrentWorkspaceViewModel is AuditLogViewModel auditLogViewModel)
         {

@@ -1,4 +1,5 @@
 using ClinicAdmin.Application;
+using ClinicAdmin.Desktop.Services;
 using ClinicAdmin.Desktop.ViewModels;
 using ClinicAdmin.Desktop.Views;
 using ClinicAdmin.Infrastructure;
@@ -36,8 +37,10 @@ public partial class App : System.Windows.Application
             {
                 services.AddApplication();
                 services.AddInfrastructure(context.Configuration);
+                services.AddSingleton<IReportExportService>(_ => new ReportExportService());
                 services.AddScoped<LoginViewModel>();
                 services.AddScoped<AuditLogViewModel>();
+                services.AddScoped<ReportsViewModel>();
                 services.AddScoped<PatientSearchViewModel>();
                 services.AddScoped<PatientRegistrationViewModel>();
                 services.AddScoped<VisitCaptureViewModel>();

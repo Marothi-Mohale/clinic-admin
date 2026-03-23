@@ -4,10 +4,13 @@ using ClinicAdmin.Application.Authorization;
 using ClinicAdmin.Application.Auditing;
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Application.Patients.Queries.SearchPatients;
+using ClinicAdmin.Application.Reports.Queries;
 using ClinicAdmin.Contracts.Auditing;
 using ClinicAdmin.Contracts.Patients;
+using ClinicAdmin.Contracts.Reports;
 using ClinicAdmin.Application.Visits.Commands.RegisterVisit;
 using ClinicAdmin.Contracts.Visits;
+using ClinicAdmin.Desktop.Services;
 using ClinicAdmin.Desktop.ViewModels;
 using ClinicAdmin.Domain.Security;
 using ClinicAdmin.Domain.Patients;
@@ -46,6 +49,10 @@ public sealed class MainWindowViewModelTests
                 new FakeFacilityContext()),
             new AuditLogViewModel(
                 new FakeAuditLogQueryService(),
+                new FakeFacilityContext()),
+            new ReportsViewModel(
+                new FakeReportingService(),
+                new FakeReportExportService(),
                 new FakeFacilityContext()));
 
         Assert.True(viewModel.IsAuthenticated);
@@ -91,6 +98,27 @@ public sealed class MainWindowViewModelTests
     {
         public Task<IReadOnlyCollection<AuditLogItemDto>> QueryAsync(AuditLogQueryDto query, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyCollection<AuditLogItemDto>>(Array.Empty<AuditLogItemDto>());
+    }
+
+    private sealed class FakeReportingService : IReportingService
+    {
+        public Task<ClinicOperationalReportDto> GetOperationalReportAsync(ReportQueryDto query, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new ClinicOperationalReportDto(
+                query.FromDate,
+                query.ToDate,
+                0,
+                0,
+                Array.Empty<DailyRegistrationReportItemDto>(),
+                Array.Empty<DailyVisitCountReportItemDto>(),
+                Array.Empty<VisitReasonReportItemDto>(),
+                Array.Empty<StaffActivityReportItemDto>(),
+                Array.Empty<PatientVisitHistorySummaryReportItemDto>()));
+    }
+
+    private sealed class FakeReportExportService : IReportExportService
+    {
+        public Task<string> ExportOperationalReportCsvAsync(ClinicOperationalReportDto report, CancellationToken cancellationToken = default) =>
+            Task.FromResult(@"C:\Exports\clinic-report.csv");
     }
 
     private sealed class FakeFacilityContext : IFacilityContext

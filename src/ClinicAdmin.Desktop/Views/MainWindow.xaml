@@ -30,6 +30,9 @@
         <DataTemplate DataType="{x:Type vm:AuditLogViewModel}">
             <views:AuditLogView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReportsViewModel}">
+            <views:ReportsView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:WorkspacePlaceholderViewModel}">
             <Border Padding="28"
                     Background="White"
