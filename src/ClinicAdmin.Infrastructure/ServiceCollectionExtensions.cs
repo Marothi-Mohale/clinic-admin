@@ -18,7 +18,9 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
         services.Configure<AuditOptions>(configuration.GetSection(AuditOptions.SectionName));
+        services.Configure<AuthenticationOptions>(configuration.GetSection(AuthenticationOptions.SectionName));
         services.Configure<FacilityOptions>(configuration.GetSection(FacilityOptions.SectionName));
+        services.Configure<SeedingOptions>(configuration.GetSection(SeedingOptions.SectionName));
         services.Configure<SyncOptions>(configuration.GetSection(SyncOptions.SectionName));
 
         var databaseOptions = configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>() ?? new DatabaseOptions();
@@ -45,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUserSessionService>(sp => sp.GetRequiredService<UserSessionService>());
         services.AddSingleton<IFacilityContext, DesktopFacilityContext>();
         services.AddSingleton<IWorkstationContext, DesktopWorkstationContext>();
+        services.AddSingleton<ILoginAttemptLimiter, InMemoryLoginAttemptLimiter>();
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ISyncJournal, SyncJournalService>();

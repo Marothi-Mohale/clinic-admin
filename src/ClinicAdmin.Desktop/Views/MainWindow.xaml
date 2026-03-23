@@ -70,12 +70,10 @@
                             CornerRadius="16">
                         <StackPanel>
                             <TextBlock FontSize="15" FontWeight="SemiBold" Foreground="White" Text="Phase 1 access" />
-                            <TextBlock Margin="0,10,0,0" Foreground="#D6E3EA" Text="Seeded users for local development:" />
-                            <TextBlock Margin="0,10,0,0" Foreground="White" Text="admin / Admin@123" />
-                            <TextBlock Foreground="White" Text="reception / Reception@123" />
-                            <TextBlock Foreground="White" Text="nurse / Nurse@123" />
-                            <TextBlock Foreground="White" Text="doctor / Doctor@123" />
-                            <TextBlock Foreground="White" Text="manager / Manager@123" />
+                            <TextBlock Margin="0,10,0,0"
+                                       Foreground="#D6E3EA"
+                                       Text="Use assigned staff credentials to sign in. Demo environments may enable seeded users through configuration."
+                                       TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
                 </StackPanel>

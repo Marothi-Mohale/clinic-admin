@@ -3,10 +3,12 @@ using ClinicAdmin.Application.Authentication;
 using ClinicAdmin.Application.Common.Validation;
 using ClinicAdmin.Domain.Security;
 using ClinicAdmin.Infrastructure.Auditing;
+using ClinicAdmin.Infrastructure.Configuration;
 using ClinicAdmin.Infrastructure.Persistence;
 using ClinicAdmin.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace ClinicAdmin.Infrastructure.Tests.Security;
 
@@ -72,7 +74,7 @@ public sealed class AuthenticationServiceTests
         var result = await authService.LoginAsync("manager", "Admin@123");
 
         Assert.False(result.Succeeded);
-        Assert.Equal(AuthenticationErrorCode.UserInactive, result.ErrorCode);
+        Assert.Equal(AuthenticationErrorCode.InvalidCredentials, result.ErrorCode);
     }
 
     [Fact]
@@ -110,6 +112,29 @@ public sealed class AuthenticationServiceTests
         Assert.False(dbContext.AuditEntries.Single().Succeeded);
     }
 
+    [Fact]
+    public async Task LoginAsync_AfterRepeatedFailures_ShouldTemporarilyLockSignIn()
+    {
+        await using var dbContext = CreateDbContext();
+        var passwordHasher = new Pbkdf2PasswordHasher();
+        var passwordHash = passwordHasher.HashPassword("Admin@123");
+        dbContext.Users.Add(new AppUser(_facilityId, "admin", "Administrator", passwordHash.Hash, passwordHash.Salt, UserRole.Admin));
+        await dbContext.SaveChangesAsync();
+
+        var sessionService = new UserSessionService();
+        var limiter = CreateLimiter(maxFailedAttempts: 3, lockoutDurationMinutes: 10);
+        var authService = CreateAuthenticationService(dbContext, passwordHasher, sessionService, limiter);
+
+        await authService.LoginAsync("admin", "Wrong-1");
+        await authService.LoginAsync("admin", "Wrong-2");
+        var thirdFailure = await authService.LoginAsync("admin", "Wrong-3");
+        var lockedOutAttempt = await authService.LoginAsync("admin", "Admin@123");
+
+        Assert.False(thirdFailure.Succeeded);
+        Assert.False(lockedOutAttempt.Succeeded);
+        Assert.Equal(AuthenticationErrorCode.LockedOut, lockedOutAttempt.ErrorCode);
+    }
+
     private ClinicAdminDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()
@@ -122,7 +147,8 @@ public sealed class AuthenticationServiceTests
     private AuthenticationService CreateAuthenticationService(
         ClinicAdminDbContext dbContext,
         IPasswordHasher passwordHasher,
-        IUserSessionService sessionService)
+        IUserSessionService sessionService,
+        ILoginAttemptLimiter? loginAttemptLimiter = null)
     {
         var facilityContext = new FakeFacilityContext(_facilityId);
         var auditService = new AuditService(
@@ -140,9 +166,17 @@ public sealed class AuthenticationServiceTests
             auditService,
             new FakeClock(),
             facilityContext,
+            loginAttemptLimiter ?? CreateLimiter(),
             new ValidatorExecutor<LoginRequest>(new[] { new LoginRequestValidator() }),
             NullLogger<AuthenticationService>.Instance);
     }
+
+    private static ILoginAttemptLimiter CreateLimiter(int maxFailedAttempts = 5, int lockoutDurationMinutes = 5) =>
+        new InMemoryLoginAttemptLimiter(Options.Create(new AuthenticationOptions
+        {
+            MaxFailedAttempts = maxFailedAttempts,
+            LockoutDurationMinutes = lockoutDurationMinutes
+        }));
 
     private sealed class FakeFacilityContext : IFacilityContext
     {

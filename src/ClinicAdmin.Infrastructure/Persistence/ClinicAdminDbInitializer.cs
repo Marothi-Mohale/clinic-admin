@@ -2,6 +2,7 @@ using ClinicAdmin.Application.Abstractions;
 using ClinicAdmin.Domain.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ClinicAdmin.Infrastructure.Persistence;
 
@@ -10,23 +11,32 @@ public sealed class ClinicAdminDbInitializer
     private readonly ClinicAdminDbContext _dbContext;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IFacilityContext _facilityContext;
+    private readonly SeedingOptions _seedingOptions;
     private readonly ILogger<ClinicAdminDbInitializer> _logger;
 
     public ClinicAdminDbInitializer(
         ClinicAdminDbContext dbContext,
         IPasswordHasher passwordHasher,
         IFacilityContext facilityContext,
+        IOptions<SeedingOptions> seedingOptions,
         ILogger<ClinicAdminDbInitializer> logger)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _facilityContext = facilityContext;
+        _seedingOptions = seedingOptions.Value;
         _logger = logger;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         await _dbContext.Database.EnsureCreatedAsync(cancellationToken);
+
+        if (!_seedingOptions.SeedDefaultUsers)
+        {
+            _logger.LogInformation("Default user seeding is disabled for facility {FacilityId}", _facilityContext.CurrentFacilityId);
+            return;
+        }
 
         if (await _dbContext.Users.AnyAsync(x => x.FacilityId == _facilityContext.CurrentFacilityId, cancellationToken))
         {

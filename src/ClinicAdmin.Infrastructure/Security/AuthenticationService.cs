@@ -16,6 +16,7 @@ public sealed class AuthenticationService : IAuthenticationService
     private readonly IAuditService _auditService;
     private readonly IClock _clock;
     private readonly IFacilityContext _facilityContext;
+    private readonly ILoginAttemptLimiter _loginAttemptLimiter;
     private readonly ValidatorExecutor<LoginRequest> _validatorExecutor;
     private readonly ILogger<AuthenticationService> _logger;
 
@@ -26,6 +27,7 @@ public sealed class AuthenticationService : IAuthenticationService
         IAuditService auditService,
         IClock clock,
         IFacilityContext facilityContext,
+        ILoginAttemptLimiter loginAttemptLimiter,
         ValidatorExecutor<LoginRequest> validatorExecutor,
         ILogger<AuthenticationService> logger)
     {
@@ -35,6 +37,7 @@ public sealed class AuthenticationService : IAuthenticationService
         _auditService = auditService;
         _clock = clock;
         _facilityContext = facilityContext;
+        _loginAttemptLimiter = loginAttemptLimiter;
         _validatorExecutor = validatorExecutor;
         _logger = logger;
     }
@@ -50,11 +53,18 @@ public sealed class AuthenticationService : IAuthenticationService
         catch (ValidationException validationException)
         {
             var message = validationException.Errors.First().ErrorMessage;
-            await _auditService.WriteAuthenticationAsync(username, false, message, cancellationToken);
+            await _auditService.WriteAuthenticationAsync(username, false, "Login validation failed.", cancellationToken);
             return AuthenticationResult.Failure(AuthenticationErrorCode.ValidationFailed, message);
         }
 
         var normalizedUsername = username.Trim().ToUpperInvariant();
+        var now = _clock.UtcNow;
+
+        if (_loginAttemptLimiter.IsLockedOut(normalizedUsername, now, out _))
+        {
+            await _auditService.WriteAuthenticationAsync(normalizedUsername, false, "Login blocked due to temporary lockout.", cancellationToken);
+            return AuthenticationResult.Failure(AuthenticationErrorCode.LockedOut, "Sign-in is temporarily locked. Please wait a few minutes and try again.");
+        }
 
         var user = await _dbContext.Users
             .SingleOrDefaultAsync(
@@ -63,23 +73,27 @@ public sealed class AuthenticationService : IAuthenticationService
 
         if (user is null)
         {
-            await _auditService.WriteAuthenticationAsync(username, false, "Unknown username.", cancellationToken);
+            _loginAttemptLimiter.RecordFailure(normalizedUsername, now);
+            await _auditService.WriteAuthenticationAsync(normalizedUsername, false, "Login failed.", cancellationToken);
             return AuthenticationResult.Failure(AuthenticationErrorCode.InvalidCredentials, "Invalid username or password.");
         }
 
         if (!user.IsActive)
         {
-            await _auditService.WriteAuthenticationAsync(username, false, "Inactive user account.", cancellationToken);
-            return AuthenticationResult.Failure(AuthenticationErrorCode.UserInactive, "Your account is inactive. Please contact an administrator.");
+            _loginAttemptLimiter.RecordFailure(normalizedUsername, now);
+            await _auditService.WriteAuthenticationAsync(normalizedUsername, false, "Login failed.", cancellationToken);
+            return AuthenticationResult.Failure(AuthenticationErrorCode.InvalidCredentials, "Invalid username or password.");
         }
 
         if (!_passwordHasher.VerifyPassword(password, user.PasswordHash, user.PasswordSalt))
         {
-            await _auditService.WriteAuthenticationAsync(username, false, "Invalid password.", cancellationToken);
+            _loginAttemptLimiter.RecordFailure(normalizedUsername, now);
+            await _auditService.WriteAuthenticationAsync(normalizedUsername, false, "Login failed.", cancellationToken);
             return AuthenticationResult.Failure(AuthenticationErrorCode.InvalidCredentials, "Invalid username or password.");
         }
 
-        var loginAtUtc = _clock.UtcNow;
+        _loginAttemptLimiter.ClearFailures(normalizedUsername);
+        var loginAtUtc = now;
         user.RecordSuccessfulLogin(loginAtUtc);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
