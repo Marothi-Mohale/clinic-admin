@@ -87,6 +87,34 @@ public sealed class RegisterPatientCommandHandlerTests
         Assert.Single(dbContext.Patients.Where(x => x.PatientNumber == "P-402"));
     }
 
+    [Fact]
+    public async Task HandleAsync_WhenExactNationalIdDuplicateExists_ShouldBlockCreation()
+    {
+        await using var dbContext = CreateDbContext();
+        dbContext.Patients.Add(new Patient(
+            _facilityId,
+            "P-500",
+            "Lindiwe",
+            "Mokoena",
+            new DateOnly(1994, 6, 10),
+            Sex.Female,
+            "9406101234088",
+            null,
+            "0821111111",
+            new Address("1 Main", null, null, "Pretoria"),
+            new NextOfKin("Relative", "Mother", "0823333333")));
+        await dbContext.SaveChangesAsync();
+
+        var handler = CreateHandler(dbContext);
+
+        var result = await handler.HandleAsync(CreateCommand("P-501", "Another", "Person"));
+
+        Assert.False(result.Succeeded);
+        Assert.False(result.RequiresConfirmation);
+        Assert.Contains("matching government identifier", result.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(dbContext.Patients, x => x.PatientNumber == "P-501");
+    }
+
     private ClinicAdminDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()

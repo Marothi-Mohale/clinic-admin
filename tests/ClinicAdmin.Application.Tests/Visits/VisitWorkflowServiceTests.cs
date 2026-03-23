@@ -79,6 +79,7 @@ public sealed class VisitWorkflowServiceTests
 
         Assert.Equal("InProgress", updated.State);
         Assert.Equal("Consultation", updated.QueueStatus);
+        Assert.Contains(dbContext.AuditEntries, x => x.Action == "VisitUpdated" && x.BeforeSummary != null && x.AfterSummary != null);
     }
 
     private ClinicAdminDbContext CreateDbContext()

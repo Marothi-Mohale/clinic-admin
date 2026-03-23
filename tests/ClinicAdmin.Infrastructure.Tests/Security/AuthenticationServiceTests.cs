@@ -96,6 +96,20 @@ public sealed class AuthenticationServiceTests
         Assert.Contains(dbContext.AuditEntries, x => x.Action == "Logout");
     }
 
+    [Fact]
+    public async Task LoginAsync_WithBlankUsername_ShouldFailValidationAndAuditAttempt()
+    {
+        await using var dbContext = CreateDbContext();
+        var authService = CreateAuthenticationService(dbContext, new Pbkdf2PasswordHasher(), new UserSessionService());
+
+        var result = await authService.LoginAsync(string.Empty, "Admin@123");
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(AuthenticationErrorCode.ValidationFailed, result.ErrorCode);
+        Assert.Single(dbContext.AuditEntries);
+        Assert.False(dbContext.AuditEntries.Single().Succeeded);
+    }
+
     private ClinicAdminDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()

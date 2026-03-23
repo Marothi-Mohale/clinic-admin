@@ -56,6 +56,18 @@ public sealed class ReportingServiceTests
         Assert.Contains(report.PatientVisitHistory, x => x.PatientNumber == "P-100" && x.VisitCount == 2);
     }
 
+    [Fact]
+    public async Task GetOperationalReportAsync_WhenDateRangeIsInvalid_ShouldThrow()
+    {
+        await using var dbContext = CreateDbContext();
+        var service = new ReportingService(dbContext);
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.GetOperationalReportAsync(new ReportQueryDto(
+            FacilityId,
+            new DateOnly(2026, 3, 22),
+            new DateOnly(2026, 3, 20))));
+    }
+
     private static ClinicAdminDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()
