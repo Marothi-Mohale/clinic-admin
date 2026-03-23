@@ -6,7 +6,7 @@ using ClinicAdmin.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace ClinicAdmin.Desktop;
 
@@ -25,18 +25,19 @@ public partial class App : System.Windows.Application
                 builder.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environments.Production}.json", optional: true, reloadOnChange: true);
                 builder.AddEnvironmentVariables(prefix: "CLINICADMIN_");
             })
-            .ConfigureLogging((context, logging) =>
+            .UseSerilog((context, _, loggerConfiguration) =>
             {
-                logging.ClearProviders();
-                logging.AddConfiguration(context.Configuration.GetSection("Logging"));
-                logging.AddDebug();
-                logging.AddConsole();
+                loggerConfiguration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.WithProperty("Application", "ClinicAdmin")
+                    .Enrich.WithProperty("Environment", Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environments.Production);
             })
             .ConfigureServices((context, services) =>
             {
                 services.AddApplication();
                 services.AddInfrastructure(context.Configuration);
                 services.AddScoped<LoginViewModel>();
+                services.AddScoped<AuditLogViewModel>();
                 services.AddScoped<PatientSearchViewModel>();
                 services.AddScoped<PatientRegistrationViewModel>();
                 services.AddScoped<VisitCaptureViewModel>();
@@ -83,6 +84,7 @@ public partial class App : System.Windows.Application
         _uiScope?.Dispose();
         await _host.StopAsync();
         _host.Dispose();
+        Log.CloseAndFlush();
         base.OnExit(e);
     }
 }

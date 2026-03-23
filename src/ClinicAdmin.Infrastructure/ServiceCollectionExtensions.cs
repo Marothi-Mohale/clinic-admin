@@ -1,4 +1,5 @@
 using ClinicAdmin.Application.Abstractions;
+using ClinicAdmin.Application.Auditing;
 using ClinicAdmin.Infrastructure.Auditing;
 using ClinicAdmin.Infrastructure.Clock;
 using ClinicAdmin.Infrastructure.Configuration;
@@ -37,11 +38,13 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ClinicAdminDbContext>());
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IAuditLogQueryService, AuditLogQueryService>();
         services.AddSingleton<IClock, SystemClock>();
         services.AddSingleton<UserSessionService>();
         services.AddSingleton<ICurrentUserService>(sp => sp.GetRequiredService<UserSessionService>());
         services.AddSingleton<IUserSessionService>(sp => sp.GetRequiredService<UserSessionService>());
         services.AddSingleton<IFacilityContext, DesktopFacilityContext>();
+        services.AddSingleton<IWorkstationContext, DesktopWorkstationContext>();
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ISyncJournal, SyncJournalService>();

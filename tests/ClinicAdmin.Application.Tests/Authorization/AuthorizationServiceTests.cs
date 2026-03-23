@@ -25,4 +25,14 @@ public sealed class AuthorizationServiceTests
         Assert.Contains("Reports", features);
         Assert.Contains("Audit", features);
     }
+
+    [Fact]
+    public void GetAllowedFeatures_WhenAdminRole_ShouldContainAudit()
+    {
+        var service = new AuthorizationService();
+
+        var features = service.GetAllowedFeatures(UserRole.Admin);
+
+        Assert.Contains("Audit", features);
+    }
 }

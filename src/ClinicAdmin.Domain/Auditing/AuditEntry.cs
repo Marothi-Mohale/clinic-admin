@@ -10,6 +10,10 @@ public sealed class AuditEntry : Entity
     public string EntityName { get; private set; }
     public Guid? EntityId { get; private set; }
     public string Details { get; private set; }
+    public string? BeforeSummary { get; private set; }
+    public string? AfterSummary { get; private set; }
+    public string? Metadata { get; private set; }
+    public string? Workstation { get; private set; }
     public bool Succeeded { get; private set; }
     public DateTimeOffset OccurredAtUtc { get; private set; }
 
@@ -20,6 +24,10 @@ public sealed class AuditEntry : Entity
         string entityName,
         Guid? entityId,
         string details,
+        string? beforeSummary,
+        string? afterSummary,
+        string? metadata,
+        string? workstation,
         bool succeeded,
         DateTimeOffset occurredAtUtc)
     {
@@ -29,6 +37,10 @@ public sealed class AuditEntry : Entity
         EntityName = GuardRequired(entityName, nameof(entityName));
         EntityId = entityId;
         Details = GuardRequired(details, nameof(details));
+        BeforeSummary = Normalize(beforeSummary);
+        AfterSummary = Normalize(afterSummary);
+        Metadata = Normalize(metadata);
+        Workstation = Normalize(workstation);
         Succeeded = succeeded;
         OccurredAtUtc = occurredAtUtc;
     }
@@ -42,4 +54,7 @@ public sealed class AuditEntry : Entity
 
         return value.Trim();
     }
+
+    private static string? Normalize(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

@@ -98,14 +98,20 @@ public sealed class AuthenticationService : IAuthenticationService
         return AuthenticationResult.Success(session);
     }
 
-    public Task LogoutAsync(CancellationToken cancellationToken = default)
+    public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
         if (_sessionService.CurrentSession is { } session)
         {
             _logger.LogInformation("User {Username} logged out.", session.Username);
+            await _auditService.WriteChangeAsync(
+                "Logout",
+                nameof(AppUser),
+                session.UserId,
+                $"User {session.Username} logged out.",
+                metadata: "{\"category\":\"authentication\"}",
+                cancellationToken: cancellationToken);
         }
 
         _sessionService.ClearSession();
-        return Task.CompletedTask;
     }
 }

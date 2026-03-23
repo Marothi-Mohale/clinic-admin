@@ -79,7 +79,14 @@ public sealed class RegisterPatientCommandHandler : IPatientRegistrationService
 
         _dbContext.Patients.Add(patient);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        await _auditService.WriteAsync("PatientRegistered", nameof(Patient), patient.Id, $"{patient.PatientNumber} {patient.FirstName} {patient.LastName}", cancellationToken);
+        await _auditService.WriteChangeAsync(
+            "PatientRegistered",
+            nameof(Patient),
+            patient.Id,
+            $"{patient.PatientNumber} {patient.FirstName} {patient.LastName}",
+            afterSummary: BuildPatientSummary(patient),
+            metadata: $"{{\"patientNumber\":\"{patient.PatientNumber}\",\"sex\":\"{patient.Sex}\",\"hasNationalId\":{(!string.IsNullOrWhiteSpace(patient.NationalIdNumber)).ToString().ToLowerInvariant()},\"hasPassport\":{(!string.IsNullOrWhiteSpace(patient.PassportNumber)).ToString().ToLowerInvariant()}}}",
+            cancellationToken: cancellationToken);
         await _syncJournal.EnqueueAsync(
             "PatientRegistered",
             nameof(Patient),
@@ -89,5 +96,11 @@ public sealed class RegisterPatientCommandHandler : IPatientRegistrationService
             cancellationToken);
 
         return RegisterPatientCommandResult.Success(patient.Id, patient.PatientNumber);
+    }
+
+    private static string BuildPatientSummary(Patient patient)
+    {
+        var dateOfBirth = patient.DateOfBirth?.ToString("yyyy-MM-dd") ?? "unknown";
+        return $"{patient.PatientNumber} | {patient.FirstName} {patient.LastName} | DOB: {dateOfBirth} | Sex: {patient.Sex}";
     }
 }

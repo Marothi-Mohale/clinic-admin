@@ -70,7 +70,14 @@ public sealed class VisitWorkflowService : IVisitWorkflowService
 
         _dbContext.Visits.Add(visit);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        await _auditService.WriteAsync("VisitRegistered", nameof(PatientVisit), visit.Id, $"{patient.PatientNumber} {command.ReasonForVisit}", cancellationToken);
+        await _auditService.WriteChangeAsync(
+            "VisitRegistered",
+            nameof(PatientVisit),
+            visit.Id,
+            $"{patient.PatientNumber} {command.ReasonForVisit}",
+            afterSummary: BuildVisitSummary(visit),
+            metadata: $"{{\"patientId\":\"{visit.PatientId}\",\"queueStatus\":\"{visit.QueueStatus}\",\"state\":\"{visit.State}\"}}",
+            cancellationToken: cancellationToken);
         await _syncJournal.EnqueueAsync(
             "VisitRegistered",
             nameof(PatientVisit),
@@ -94,6 +101,8 @@ public sealed class VisitWorkflowService : IVisitWorkflowService
             throw new InvalidOperationException("The visit could not be found.");
         }
 
+        var beforeSummary = BuildVisitSummary(visit);
+
         visit.UpdateWorkflow(
             command.QueueStatus,
             command.State,
@@ -108,7 +117,15 @@ public sealed class VisitWorkflowService : IVisitWorkflowService
             .AsNoTracking()
             .SingleAsync(x => x.Id == visit.PatientId, cancellationToken);
 
-        await _auditService.WriteAsync("VisitUpdated", nameof(PatientVisit), visit.Id, $"{patient.PatientNumber} {command.State} {command.QueueStatus}", cancellationToken);
+        await _auditService.WriteChangeAsync(
+            "VisitUpdated",
+            nameof(PatientVisit),
+            visit.Id,
+            $"{patient.PatientNumber} {command.State} {command.QueueStatus}",
+            beforeSummary: beforeSummary,
+            afterSummary: BuildVisitSummary(visit),
+            metadata: $"{{\"patientId\":\"{visit.PatientId}\",\"queueStatus\":\"{visit.QueueStatus}\",\"state\":\"{visit.State}\"}}",
+            cancellationToken: cancellationToken);
 
         return ToSummaryDto(visit, patient.PatientNumber, $"{patient.FirstName} {patient.LastName}");
     }
@@ -147,4 +164,7 @@ public sealed class VisitWorkflowService : IVisitWorkflowService
             visit.Department,
             visit.AssignedStaffMember,
             visit.Notes);
+
+    private static string BuildVisitSummary(PatientVisit visit) =>
+        $"{visit.ReasonForVisit} | Queue: {visit.QueueStatus} | State: {visit.State} | Department: {visit.Department ?? "Unassigned"} | Staff: {visit.AssignedStaffMember ?? "Unassigned"}";
 }

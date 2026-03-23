@@ -14,6 +14,7 @@ public sealed class MainWindowViewModel : ViewModelBase
     private readonly PatientRegistrationViewModel _patientRegistrationViewModel;
     private readonly PatientSearchViewModel _patientSearchViewModel;
     private readonly VisitCaptureViewModel _visitCaptureViewModel;
+    private readonly AuditLogViewModel _auditLogViewModel;
     private bool _isAuthenticated;
     private string _currentUserDisplayName = "Not signed in";
     private string _currentRole = "Guest";
@@ -27,7 +28,8 @@ public sealed class MainWindowViewModel : ViewModelBase
         IAuthorizationService authorizationService,
         PatientRegistrationViewModel patientRegistrationViewModel,
         PatientSearchViewModel patientSearchViewModel,
-        VisitCaptureViewModel visitCaptureViewModel)
+        VisitCaptureViewModel visitCaptureViewModel,
+        AuditLogViewModel auditLogViewModel)
     {
         Login = login;
         _userSessionService = userSessionService;
@@ -36,6 +38,7 @@ public sealed class MainWindowViewModel : ViewModelBase
         _patientRegistrationViewModel = patientRegistrationViewModel;
         _patientSearchViewModel = patientSearchViewModel;
         _visitCaptureViewModel = visitCaptureViewModel;
+        _auditLogViewModel = auditLogViewModel;
         NavigationItems = new ObservableCollection<NavigationItemViewModel>();
         LogoutCommand = new AsyncRelayCommand(LogoutAsync, () => IsAuthenticated);
 
@@ -157,6 +160,7 @@ public sealed class MainWindowViewModel : ViewModelBase
                 new NavigationItemViewModel("Register", "Register", "Capture a new patient at the reception desk."),
                 new NavigationItemViewModel("Visits", "Visits", "Capture and review clinic visits."),
                 new NavigationItemViewModel("Reports", "Reports", "Operational and compliance reporting."),
+                new NavigationItemViewModel("Audit", "Audit", "Review user actions, login attempts, and record changes."),
                 new NavigationItemViewModel("Administration", "Administration", "Manage users, roles, and clinic settings.")
             },
             UserRole.Receptionist => new[]
@@ -196,9 +200,15 @@ public sealed class MainWindowViewModel : ViewModelBase
             "Patients" => _patientSearchViewModel,
             "Register" when currentRole is UserRole.Admin or UserRole.Receptionist => _patientRegistrationViewModel,
             "Visits" => _visitCaptureViewModel,
+            "Audit" when currentRole is UserRole.Admin or UserRole.Manager => _auditLogViewModel,
             _ => new WorkspacePlaceholderViewModel(
                 SelectedRoute,
                 "This workspace will be implemented in the next module. Authentication and route access are already enforced.")
         };
+
+        if (SelectedRoute == "Audit" && CurrentWorkspaceViewModel is AuditLogViewModel auditLogViewModel)
+        {
+            _ = auditLogViewModel.InitializeAsync();
+        }
     }
 }

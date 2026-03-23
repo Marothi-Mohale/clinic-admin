@@ -113,7 +113,7 @@ public sealed class VisitWorkflowServiceTests
     {
         var facilityContext = new FakeFacilityContext(_facilityId);
         var sessionService = new UserSessionService();
-        var auditService = new AuditService(dbContext, sessionService, new FakeClock(), facilityContext, NullLogger<AuditService>.Instance);
+        var auditService = new AuditService(dbContext, sessionService, new FakeClock(), facilityContext, new FakeWorkstationContext(), NullLogger<AuditService>.Instance);
 
         return new VisitWorkflowService(
             dbContext,
@@ -138,5 +138,10 @@ public sealed class VisitWorkflowServiceTests
     private sealed class FakeClock : IClock
     {
         public DateTimeOffset UtcNow => new(2026, 3, 23, 9, 0, 0, TimeSpan.Zero);
+    }
+
+    private sealed class FakeWorkstationContext : IWorkstationContext
+    {
+        public string WorkstationName => "TEST-WS";
     }
 }

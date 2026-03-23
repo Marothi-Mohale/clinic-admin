@@ -1,8 +1,10 @@
 using ClinicAdmin.Application.Abstractions;
 using ClinicAdmin.Application.Authentication;
 using ClinicAdmin.Application.Authorization;
+using ClinicAdmin.Application.Auditing;
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
 using ClinicAdmin.Application.Patients.Queries.SearchPatients;
+using ClinicAdmin.Contracts.Auditing;
 using ClinicAdmin.Contracts.Patients;
 using ClinicAdmin.Application.Visits.Commands.RegisterVisit;
 using ClinicAdmin.Contracts.Visits;
@@ -41,10 +43,14 @@ public sealed class MainWindowViewModelTests
             new VisitCaptureViewModel(
                 new FakePatientSearchService(),
                 new FakeVisitWorkflowService(),
+                new FakeFacilityContext()),
+            new AuditLogViewModel(
+                new FakeAuditLogQueryService(),
                 new FakeFacilityContext()));
 
         Assert.True(viewModel.IsAuthenticated);
         Assert.Contains(viewModel.NavigationItems, item => item.Route == "Reports");
+        Assert.Contains(viewModel.NavigationItems, item => item.Route == "Audit");
         Assert.DoesNotContain(viewModel.NavigationItems, item => item.Route == "Administration");
     }
 
@@ -79,6 +85,12 @@ public sealed class MainWindowViewModelTests
 
         public Task<VisitSummaryDto> UpdateVisitAsync(UpdateVisitStateCommand command, CancellationToken cancellationToken = default) =>
             Task.FromResult(new VisitSummaryDto(command.VisitId, Guid.NewGuid(), "P-100", "Patient", DateTimeOffset.UtcNow, "Review", command.QueueStatus.ToString(), command.State.ToString(), command.Department, command.AssignedStaffMember, command.Notes ?? string.Empty));
+    }
+
+    private sealed class FakeAuditLogQueryService : IAuditLogQueryService
+    {
+        public Task<IReadOnlyCollection<AuditLogItemDto>> QueryAsync(AuditLogQueryDto query, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyCollection<AuditLogItemDto>>(Array.Empty<AuditLogItemDto>());
     }
 
     private sealed class FakeFacilityContext : IFacilityContext

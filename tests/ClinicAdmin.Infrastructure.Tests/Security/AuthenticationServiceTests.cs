@@ -92,6 +92,8 @@ public sealed class AuthenticationServiceTests
 
         Assert.False(sessionService.IsAuthenticated);
         Assert.Null(sessionService.CurrentSession);
+        Assert.Equal(2, dbContext.AuditEntries.Count());
+        Assert.Contains(dbContext.AuditEntries, x => x.Action == "Logout");
     }
 
     private ClinicAdminDbContext CreateDbContext()
@@ -114,6 +116,7 @@ public sealed class AuthenticationServiceTests
             (ICurrentUserService)sessionService,
             new FakeClock(),
             facilityContext,
+            new FakeWorkstationContext(),
             NullLogger<AuditService>.Instance);
 
         return new AuthenticationService(
@@ -141,5 +144,10 @@ public sealed class AuthenticationServiceTests
     private sealed class FakeClock : IClock
     {
         public DateTimeOffset UtcNow => new(2026, 3, 23, 7, 0, 0, TimeSpan.Zero);
+    }
+
+    private sealed class FakeWorkstationContext : IWorkstationContext
+    {
+        public string WorkstationName => "TEST-WS";
     }
 }

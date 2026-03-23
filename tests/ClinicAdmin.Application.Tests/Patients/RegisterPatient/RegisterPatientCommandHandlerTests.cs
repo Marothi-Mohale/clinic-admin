@@ -100,7 +100,7 @@ public sealed class RegisterPatientCommandHandlerTests
     {
         var facilityContext = new FakeFacilityContext(_facilityId);
         var sessionService = new UserSessionService();
-        var auditService = new AuditService(dbContext, sessionService, new FakeClock(), facilityContext, NullLogger<AuditService>.Instance);
+        var auditService = new AuditService(dbContext, sessionService, new FakeClock(), facilityContext, new FakeWorkstationContext(), NullLogger<AuditService>.Instance);
         var duplicateQueryService = new PatientRegistrationDuplicateQueryService(dbContext);
         var duplicateWarningService = new PatientRegistrationDuplicateWarningService(duplicateQueryService, new PatientDuplicateDetectionService());
 
@@ -146,5 +146,10 @@ public sealed class RegisterPatientCommandHandlerTests
     private sealed class FakeClock : IClock
     {
         public DateTimeOffset UtcNow => new(2026, 3, 23, 8, 0, 0, TimeSpan.Zero);
+    }
+
+    private sealed class FakeWorkstationContext : IWorkstationContext
+    {
+        public string WorkstationName => "TEST-WS";
     }
 }

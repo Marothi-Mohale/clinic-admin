@@ -7,7 +7,7 @@ public sealed class AuthorizationService : IAuthorizationService
 {
     private static readonly IReadOnlyDictionary<UserRole, string[]> FeatureMap = new Dictionary<UserRole, string[]>
     {
-        [UserRole.Admin] = ["Dashboard", "Patients", "Register", "Visits", "Reports", "Administration"],
+        [UserRole.Admin] = ["Dashboard", "Patients", "Register", "Visits", "Reports", "Audit", "Administration"],
         [UserRole.Receptionist] = ["Dashboard", "Patients", "Register", "Visits", "Files"],
         [UserRole.Nurse] = ["Dashboard", "Patients", "Visits"],
         [UserRole.Doctor] = ["Dashboard", "Patients", "History"],
