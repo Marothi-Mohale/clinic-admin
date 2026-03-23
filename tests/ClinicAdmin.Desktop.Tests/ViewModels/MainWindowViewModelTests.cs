@@ -2,6 +2,8 @@ using ClinicAdmin.Application.Abstractions;
 using ClinicAdmin.Application.Authentication;
 using ClinicAdmin.Application.Authorization;
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;
+using ClinicAdmin.Application.Patients.Queries.SearchPatients;
+using ClinicAdmin.Contracts.Patients;
 using ClinicAdmin.Desktop.ViewModels;
 using ClinicAdmin.Domain.Security;
 using ClinicAdmin.Domain.Patients;
@@ -30,6 +32,9 @@ public sealed class MainWindowViewModelTests
             new PatientRegistrationViewModel(
                 new FakePatientRegistrationService(),
                 new FakeDuplicateWarningService(),
+                new FakeFacilityContext()),
+            new PatientSearchViewModel(
+                new FakePatientSearchService(),
                 new FakeFacilityContext()));
 
         Assert.True(viewModel.IsAuthenticated);
@@ -47,6 +52,15 @@ public sealed class MainWindowViewModelTests
     {
         public Task<DuplicateWarningResult> CheckAsync(RegisterPatientCommand command, CancellationToken cancellationToken = default) =>
             Task.FromResult(new DuplicateWarningResult(ClinicAdmin.Application.Patients.DuplicateDetection.DuplicateActionRecommendation.SafeToCreate, Array.Empty<ClinicAdmin.Contracts.Patients.DuplicatePatientWarningDto>()));
+    }
+
+    private sealed class FakePatientSearchService : IPatientSearchService
+    {
+        public Task<PatientProfileDto?> GetProfileAsync(Guid facilityId, Guid patientId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<PatientProfileDto?>(null);
+
+        public Task<IReadOnlyCollection<PatientSearchResultDto>> SearchAsync(SearchPatientsQuery query, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyCollection<PatientSearchResultDto>>(Array.Empty<PatientSearchResultDto>());
     }
 
     private sealed class FakeFacilityContext : IFacilityContext

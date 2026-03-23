@@ -8,4 +8,6 @@ public sealed record PatientSearchResultDto(
     string? NationalIdNumber,
     string? PassportNumber,
     string? PhoneNumber,
-    string? FileNumber);
+    string? FileNumber,
+    string? FileStatus,
+    string? FileLocation);

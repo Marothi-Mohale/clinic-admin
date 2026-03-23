@@ -12,6 +12,7 @@ public sealed class MainWindowViewModel : ViewModelBase
     private readonly IAuthenticationService _authenticationService;
     private readonly IAuthorizationService _authorizationService;
     private readonly PatientRegistrationViewModel _patientRegistrationViewModel;
+    private readonly PatientSearchViewModel _patientSearchViewModel;
     private bool _isAuthenticated;
     private string _currentUserDisplayName = "Not signed in";
     private string _currentRole = "Guest";
@@ -23,13 +24,15 @@ public sealed class MainWindowViewModel : ViewModelBase
         IUserSessionService userSessionService,
         IAuthenticationService authenticationService,
         IAuthorizationService authorizationService,
-        PatientRegistrationViewModel patientRegistrationViewModel)
+        PatientRegistrationViewModel patientRegistrationViewModel,
+        PatientSearchViewModel patientSearchViewModel)
     {
         Login = login;
         _userSessionService = userSessionService;
         _authenticationService = authenticationService;
         _authorizationService = authorizationService;
         _patientRegistrationViewModel = patientRegistrationViewModel;
+        _patientSearchViewModel = patientSearchViewModel;
         NavigationItems = new ObservableCollection<NavigationItemViewModel>();
         LogoutCommand = new AsyncRelayCommand(LogoutAsync, () => IsAuthenticated);
 
@@ -147,7 +150,8 @@ public sealed class MainWindowViewModel : ViewModelBase
             UserRole.Admin => new[]
             {
                 new NavigationItemViewModel("Dashboard", "Dashboard", "Operational overview and quick actions."),
-                new NavigationItemViewModel("Patients", "Patients", "Register, search, and manage patient records."),
+                new NavigationItemViewModel("Patients", "Patients", "Search patients and retrieve file status quickly."),
+                new NavigationItemViewModel("Register", "Register", "Capture a new patient at the reception desk."),
                 new NavigationItemViewModel("Visits", "Visits", "Capture and review clinic visits."),
                 new NavigationItemViewModel("Reports", "Reports", "Operational and compliance reporting."),
                 new NavigationItemViewModel("Administration", "Administration", "Manage users, roles, and clinic settings.")
@@ -155,7 +159,8 @@ public sealed class MainWindowViewModel : ViewModelBase
             UserRole.Receptionist => new[]
             {
                 new NavigationItemViewModel("Dashboard", "Dashboard", "High-speed front desk tasks and daily status."),
-                new NavigationItemViewModel("Patients", "Patients", "Register and search patient records."),
+                new NavigationItemViewModel("Patients", "Patients", "Search patients and retrieve file status."),
+                new NavigationItemViewModel("Register", "Register", "Register a new patient quickly."),
                 new NavigationItemViewModel("Visits", "Visits", "Capture new patient visits."),
                 new NavigationItemViewModel("Files", "Files", "Track file issue and return status.")
             },
@@ -185,7 +190,8 @@ public sealed class MainWindowViewModel : ViewModelBase
         var currentRole = _userSessionService.CurrentSession?.Role;
         CurrentWorkspaceViewModel = SelectedRoute switch
         {
-            "Patients" when currentRole is UserRole.Admin or UserRole.Receptionist => _patientRegistrationViewModel,
+            "Patients" => _patientSearchViewModel,
+            "Register" when currentRole is UserRole.Admin or UserRole.Receptionist => _patientRegistrationViewModel,
             _ => new WorkspacePlaceholderViewModel(
                 SelectedRoute,
                 "This workspace will be implemented in the next module. Authentication and route access are already enforced.")

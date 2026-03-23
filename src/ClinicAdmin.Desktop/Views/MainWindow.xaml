@@ -21,6 +21,9 @@
         <DataTemplate DataType="{x:Type vm:PatientRegistrationViewModel}">
             <views:PatientRegistrationView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PatientSearchViewModel}">
+            <views:PatientSearchView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:WorkspacePlaceholderViewModel}">
             <Border Padding="28"
                     Background="White"

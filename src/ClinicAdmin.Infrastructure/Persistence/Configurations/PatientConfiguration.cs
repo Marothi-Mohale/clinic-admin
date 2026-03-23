@@ -34,5 +34,6 @@ public sealed class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.HasIndex(x => new { x.FacilityId, x.LastName, x.FirstName });
         builder.HasIndex(x => new { x.FacilityId, x.NationalIdNumber });
         builder.HasIndex(x => new { x.FacilityId, x.PassportNumber });
+        builder.HasIndex(x => new { x.FacilityId, x.PhoneNumber });
     }
 }

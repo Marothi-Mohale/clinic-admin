@@ -7,8 +7,8 @@ public sealed class AuthorizationService : IAuthorizationService
 {
     private static readonly IReadOnlyDictionary<UserRole, string[]> FeatureMap = new Dictionary<UserRole, string[]>
     {
-        [UserRole.Admin] = ["Dashboard", "Patients", "Visits", "Reports", "Administration"],
-        [UserRole.Receptionist] = ["Dashboard", "Patients", "Visits", "Files"],
+        [UserRole.Admin] = ["Dashboard", "Patients", "Register", "Visits", "Reports", "Administration"],
+        [UserRole.Receptionist] = ["Dashboard", "Patients", "Register", "Visits", "Files"],
         [UserRole.Nurse] = ["Dashboard", "Patients", "Visits"],
         [UserRole.Doctor] = ["Dashboard", "Patients", "History"],
         [UserRole.Manager] = ["Dashboard", "Reports", "Audit"]
@@ -23,4 +23,3 @@ public sealed class AuthorizationService : IAuthorizationService
             ? features
             : Array.Empty<string>();
 }
-
