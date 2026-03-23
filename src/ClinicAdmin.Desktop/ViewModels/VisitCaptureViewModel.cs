@@ -49,6 +49,8 @@ public sealed class VisitCaptureViewModel : ViewModelBase
 
     public ObservableCollection<VisitHistoryItemViewModel> VisitHistory { get; }
 
+    public bool HasVisitHistory => VisitHistory.Count > 0;
+
     public IReadOnlyCollection<QueueStatus> QueueStatusOptions { get; }
 
     public IReadOnlyCollection<VisitState> VisitStateOptions { get; }
@@ -184,6 +186,7 @@ public sealed class VisitCaptureViewModel : ViewModelBase
             PatientResults.Clear();
             SelectedPatient = null;
             VisitHistory.Clear();
+            RaisePropertyChanged(nameof(HasVisitHistory));
 
             var results = await _patientSearchService.SearchAsync(new SearchPatientsQuery(_facilityContext.CurrentFacilityId, PatientSearchTerm, 0, 15));
             foreach (var result in results)
@@ -330,6 +333,8 @@ public sealed class VisitCaptureViewModel : ViewModelBase
                     Notes = item.Notes
                 });
             }
+
+            RaisePropertyChanged(nameof(HasVisitHistory));
         });
     }
 

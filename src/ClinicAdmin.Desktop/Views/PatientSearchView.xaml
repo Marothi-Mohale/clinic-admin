@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:ClinicAdmin.Desktop.Controls"
              mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -11,11 +12,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Padding="20"
-                Background="White"
-                BorderBrush="#D8DEE4"
-                BorderThickness="1"
-                CornerRadius="18">
+        <Border Style="{StaticResource CardBorderStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -24,30 +21,26 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
-                    <TextBlock FontSize="24" FontWeight="SemiBold" Text="Patient search" />
+                    <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Patient search" />
                     <TextBlock Margin="0,8,0,0"
-                               Foreground="#5C6670"
+                               Style="{StaticResource SubtleTextStyle}"
                                Text="Search by patient number, ID, passport, phone number, surname, or full name." />
                     <TextBox Margin="0,16,0,0"
-                             Height="38"
-                             Padding="12,6"
+                             Style="{StaticResource TextInputStyle}"
                              Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
                 <Button Grid.Column="1"
                         Margin="16,30,0,0"
                         Width="120"
-                        Height="38"
-                        Background="#0E7490"
-                        Foreground="White"
-                        BorderBrush="#0E7490"
+                        Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding SearchCommand}"
                         Content="Search" />
 
                 <Button Grid.Column="2"
                         Margin="12,30,0,0"
                         Width="100"
-                        Height="38"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         Command="{Binding ClearSearchCommand}"
                         Content="Clear" />
             </Grid>
@@ -60,11 +53,7 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
-            <Border Padding="20"
-                    Background="White"
-                    BorderBrush="#D8DEE4"
-                    BorderThickness="1"
-                    CornerRadius="18">
+            <Border Style="{StaticResource CardBorderStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -72,26 +61,17 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Foreground="#4B5563" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource SubtleTextStyle}" Text="{Binding StatusMessage}" />
 
                     <Grid Grid.Row="2">
-                        <TextBlock Visibility="{Binding HasResults, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"
-                                   Foreground="#6B7280"
-                                   Text="{Binding StatusMessage}"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center" />
+                        <controls:EmptyStateView Visibility="{Binding HasResults, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                                 Title="No patient selected"
+                                                 Message="{Binding StatusMessage}" />
 
                         <DataGrid ItemsSource="{Binding Results}"
                                   SelectedItem="{Binding SelectedResult, Mode=TwoWay}"
                                   Visibility="{Binding HasResults, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  CanUserDeleteRows="False"
-                                  IsReadOnly="True"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal"
+                                  Style="{StaticResource FlatDataGridStyle}"
                                   SelectionMode="Single"
                                   RowHeaderWidth="0">
                             <DataGrid.Columns>
@@ -108,12 +88,7 @@
                 </Grid>
             </Border>
 
-            <Border Grid.Column="2"
-                    Padding="20"
-                    Background="White"
-                    BorderBrush="#D8DEE4"
-                    BorderThickness="1"
-                    CornerRadius="18">
+            <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -122,16 +97,16 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel>
-                        <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding SelectedProfile.DisplayName}" />
-                        <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="{Binding SelectedProfile.PatientNumber, StringFormat=Patient no: {0}}" />
-                        <TextBlock Foreground="#5C6670" Text="{Binding SelectedProfile.Summary}" />
+                        <TextBlock Style="{StaticResource SectionTitleTextStyle}" Text="{Binding SelectedProfile.DisplayName}" />
+                        <TextBlock Margin="0,8,0,0" Style="{StaticResource SubtleTextStyle}" Text="{Binding SelectedProfile.PatientNumber, StringFormat=Patient no: {0}}" />
+                        <TextBlock Style="{StaticResource SubtleTextStyle}" Text="{Binding SelectedProfile.Summary}" />
                     </StackPanel>
 
                     <Button Grid.Row="1"
                             Width="120"
-                            Height="34"
                             Margin="0,14,0,0"
                             HorizontalAlignment="Left"
+                            Style="{StaticResource SecondaryButtonStyle}"
                             Command="{Binding OpenProfileCommand}"
                             Content="Open profile" />
 
@@ -158,14 +133,11 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Margin="0,0,0,10"
-                                                Padding="10"
-                                                Background="#F8FAFC"
-                                                BorderBrush="#D8DEE4"
-                                                BorderThickness="1"
-                                                CornerRadius="10">
+                                                Style="{StaticResource SecondaryCardBorderStyle}"
+                                                Padding="10">
                                             <StackPanel>
                                                 <TextBlock FontWeight="SemiBold" Text="{Binding Action}" />
-                                                <TextBlock Margin="0,4,0,0" Foreground="#5C6670" Text="{Binding OccurredAtUtc, StringFormat={}{0:yyyy-MM-dd HH:mm} UTC}" />
+                                                <TextBlock Margin="0,4,0,0" Style="{StaticResource SubtleTextStyle}" Text="{Binding OccurredAtUtc, StringFormat={}{0:yyyy-MM-dd HH:mm} UTC}" />
                                                 <TextBlock Margin="0,4,0,0" Text="{Binding Details}" TextWrapping="Wrap" />
                                             </StackPanel>
                                         </Border>

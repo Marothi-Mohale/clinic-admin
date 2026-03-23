@@ -11,11 +11,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Padding="20"
-                Background="White"
-                BorderBrush="#D8DEE4"
-                BorderThickness="1"
-                CornerRadius="18">
+        <Border Style="{StaticResource CardBorderStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
@@ -26,37 +22,30 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox Height="36"
+                <TextBox Style="{StaticResource TextInputStyle}"
                          Margin="0,0,12,0"
-                         Padding="12,6"
                          Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBox Grid.Column="1"
-                         Height="36"
+                         Style="{StaticResource TextInputStyle}"
                          Margin="0,0,12,0"
-                         Padding="12,6"
                          Text="{Binding ActionFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBox Grid.Column="2"
-                         Height="36"
+                         Style="{StaticResource TextInputStyle}"
                          Margin="0,0,12,0"
-                         Padding="12,6"
                          Text="{Binding EntityFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBox Grid.Column="3"
-                         Height="36"
+                         Style="{StaticResource TextInputStyle}"
                          Margin="0,0,12,0"
-                         Padding="12,6"
                          Text="{Binding ActorFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Grid.Column="4"
                         Width="110"
-                        Height="36"
-                        Background="#0E7490"
-                        Foreground="White"
-                        BorderBrush="#0E7490"
+                        Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding LoadAuditCommand}"
                         Content="Load audit" />
                 <Button Grid.Column="5"
                         Width="90"
-                        Height="36"
                         Margin="12,0,0,0"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         Command="{Binding ClearFiltersCommand}"
                         Content="Clear" />
             </Grid>
@@ -69,11 +58,7 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
-            <Border Padding="20"
-                    Background="White"
-                    BorderBrush="#D8DEE4"
-                    BorderThickness="1"
-                    CornerRadius="18">
+            <Border Style="{StaticResource CardBorderStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -81,15 +66,11 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Foreground="#4B5563" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource SubtleTextStyle}" Text="{Binding StatusMessage}" />
 
                     <DataGrid Grid.Row="2"
                               ItemsSource="{Binding AuditItems}"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              CanUserDeleteRows="False"
-                              IsReadOnly="True"
-                              RowHeaderWidth="0">
+                              Style="{StaticResource FlatDataGridStyle}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Time (UTC)" Binding="{Binding OccurredAtUtc}" Width="160" />
                             <DataGridTextColumn Header="User" Binding="{Binding ActorUsername}" Width="110" />
@@ -103,14 +84,10 @@
             </Border>
 
             <Border Grid.Column="2"
-                    Padding="20"
-                    Background="White"
-                    BorderBrush="#D8DEE4"
-                    BorderThickness="1"
-                    CornerRadius="18">
+                    Style="{StaticResource CardBorderStyle}">
                 <StackPanel>
-                    <TextBlock FontSize="20" FontWeight="SemiBold" Text="Audit notes" />
-                    <TextBlock Margin="0,10,0,0" Foreground="#5C6670" TextWrapping="Wrap">
+                    <TextBlock Style="{StaticResource SectionTitleTextStyle}" Text="Audit notes" />
+                    <TextBlock Margin="0,10,0,0" Style="{StaticResource SubtleTextStyle}">
                         Audit data is intentionally summarized. Sensitive patient data should be represented as short operational summaries rather than full clinical detail.
                     </TextBlock>
                     <TextBlock Margin="0,18,0,0" FontSize="16" FontWeight="SemiBold" Text="Recommended filters" />
@@ -123,4 +100,3 @@
         </Grid>
     </Grid>
 </UserControl>
-

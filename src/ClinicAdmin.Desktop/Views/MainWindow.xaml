@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:ClinicAdmin.Desktop.Controls"
         xmlns:converters="clr-namespace:ClinicAdmin.Desktop.Converters"
         xmlns:vm="clr-namespace:ClinicAdmin.Desktop.ViewModels"
         xmlns:views="clr-namespace:ClinicAdmin.Desktop.Views"
@@ -34,14 +35,11 @@
             <views:ReportsView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:WorkspacePlaceholderViewModel}">
-            <Border Padding="28"
-                    Background="White"
-                    BorderBrush="#D8DEE4"
-                    BorderThickness="1"
-                    CornerRadius="20">
+            <Border Style="{StaticResource CardBorderStyle}"
+                    Padding="28">
                 <StackPanel>
-                    <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding Title}" />
-                    <TextBlock Margin="0,14,0,0" Foreground="#4B5563" Text="{Binding Description}" TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource SectionTitleTextStyle}" Text="{Binding Title}" />
+                    <TextBlock Margin="0,14,0,0" Style="{StaticResource SubtleTextStyle}" Text="{Binding Description}" />
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -55,7 +53,7 @@
 
             <Border Margin="24"
                     Padding="40"
-                    Background="#15354B"
+                    Background="{StaticResource ShellBrush}"
                     CornerRadius="24">
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock FontSize="34" FontWeight="SemiBold" Foreground="White" Text="{Binding Title}" />
@@ -66,7 +64,7 @@
                                Text="{Binding Subtitle}" />
                     <Border Margin="0,28,0,0"
                             Padding="20"
-                            Background="#214B66"
+                            Background="{StaticResource ShellAccentBrush}"
                             CornerRadius="16">
                         <StackPanel>
                             <TextBlock FontSize="15" FontWeight="SemiBold" Foreground="White" Text="Phase 1 access" />
@@ -80,42 +78,37 @@
             </Border>
 
             <Grid Grid.Column="1" Margin="24">
-                <Border Padding="36"
-                        Background="White"
-                        BorderBrush="#D8DEE4"
-                        BorderThickness="1"
-                        CornerRadius="24"
+                <Border Style="{StaticResource CardBorderStyle}"
+                        Padding="36"
                         VerticalAlignment="Center">
                     <StackPanel>
-                        <TextBlock FontSize="28" FontWeight="SemiBold" Text="Sign in" />
-                        <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="Secure access for clinic staff" />
+                        <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Sign in" />
+                        <TextBlock Margin="0,8,0,0" Style="{StaticResource SubtleTextStyle}" Text="Secure access for clinic staff" />
 
                         <TextBlock Margin="0,24,0,6" FontWeight="SemiBold" Text="Username" />
-                        <TextBox Height="38"
-                                 Padding="10,6"
+                        <TextBox Style="{StaticResource TextInputStyle}"
                                  Text="{Binding Login.Username, UpdateSourceTrigger=PropertyChanged}" />
 
                         <TextBlock Margin="0,16,0,6" FontWeight="SemiBold" Text="Password" />
                         <PasswordBox x:Name="PasswordInput"
                                      Height="38"
-                                     Padding="10,6"
+                                     Padding="12,7"
+                                     BorderBrush="{StaticResource BorderBrushNeutral}"
+                                     BorderThickness="1"
                                      PasswordChanged="PasswordInput_OnPasswordChanged" />
 
                         <Border Margin="0,16,0,0"
                                 Padding="10"
-                                Background="#FFF5F5"
+                                Background="{StaticResource DangerSurfaceBrush}"
                                 BorderBrush="#E7B4B4"
                                 BorderThickness="1"
                                 CornerRadius="10"
                                 Visibility="{Binding Login.ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
-                            <TextBlock Foreground="#A1260D" Text="{Binding Login.ErrorMessage}" TextWrapping="Wrap" />
+                            <TextBlock Foreground="{StaticResource DangerBrush}" Text="{Binding Login.ErrorMessage}" TextWrapping="Wrap" />
                         </Border>
 
                         <Button Margin="0,24,0,0"
-                                Height="42"
-                                Background="#0E7490"
-                                Foreground="White"
-                                BorderBrush="#0E7490"
+                                Style="{StaticResource PrimaryButtonStyle}"
                                 Command="{Binding Login.LoginCommand}"
                                 Content="Sign in" />
                     </StackPanel>
@@ -129,7 +122,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border Background="#123247">
+            <Border Background="{StaticResource ShellBrush}">
                 <DockPanel Margin="20">
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock FontSize="24" FontWeight="SemiBold" Foreground="White" Text="{Binding Title}" />
@@ -147,7 +140,7 @@
                                  Foreground="White">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,6,0,0" Padding="12" Background="#1D4C67" CornerRadius="10">
+                                    <Border Margin="0,6,0,0" Padding="12" Background="{StaticResource ShellAccentBrush}" CornerRadius="10">
                                         <StackPanel>
                                             <TextBlock FontWeight="SemiBold" Text="{Binding Title}" />
                                             <TextBlock Margin="0,4,0,0"
@@ -164,9 +157,7 @@
 
                     <Button DockPanel.Dock="Bottom"
                             Margin="0,24,0,0"
-                            Height="40"
-                            Background="#E2E8F0"
-                            BorderBrush="#E2E8F0"
+                            Style="{StaticResource SecondaryButtonStyle}"
                             Command="{Binding LogoutCommand}"
                             Content="Sign out" />
                 </DockPanel>
@@ -180,8 +171,8 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel>
-                    <TextBlock FontSize="30" FontWeight="SemiBold" Text="{Binding SelectedRoute}" />
-                    <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="{Binding CurrentRouteDescription}" TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="{Binding SelectedRoute}" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource SubtleTextStyle}" Text="{Binding CurrentRouteDescription}" />
                 </StackPanel>
 
                 <ContentControl Grid.Row="2" Content="{Binding CurrentWorkspaceViewModel}" />

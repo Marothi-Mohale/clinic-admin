@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:ClinicAdmin.Desktop.Controls"
              mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -11,11 +12,9 @@
             <ColumnDefinition Width="1.2*" />
         </Grid.ColumnDefinitions>
 
-        <Border Padding="24"
-                Background="#FBFCFD"
-                BorderBrush="#D8DEE4"
-                BorderThickness="1"
-                CornerRadius="18">
+        <Border Style="{StaticResource CardBorderStyle}"
+                Background="{StaticResource SurfaceAltBrush}"
+                Padding="24">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -25,8 +24,8 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel>
-                    <TextBlock FontSize="24" FontWeight="SemiBold" Text="Register patient" />
-                    <TextBlock Margin="0,8,0,0" Foreground="#5C6670" Text="Capture the essential details quickly. Use Tab to move through fields." />
+                    <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Register patient" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource SubtleTextStyle}" Text="Capture the essential details quickly. Use Tab to move through fields." />
                 </StackPanel>
 
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
@@ -34,34 +33,34 @@
                         <UniformGrid Columns="2" Margin="0,0,0,18">
                             <StackPanel Margin="0,0,12,0">
                                 <TextBlock FontWeight="SemiBold" Text="Patient number" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding PatientNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding PatientNumber, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                             <StackPanel Margin="12,0,0,0">
                                 <TextBlock FontWeight="SemiBold" Text="Phone number" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </UniformGrid>
 
                         <UniformGrid Columns="2" Margin="0,0,0,18">
                             <StackPanel Margin="0,0,12,0">
                                 <TextBlock FontWeight="SemiBold" Text="First name" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                             <StackPanel Margin="12,0,0,0">
                                 <TextBlock FontWeight="SemiBold" Text="Surname" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </UniformGrid>
 
                         <UniformGrid Columns="2" Margin="0,0,0,18">
                             <StackPanel Margin="0,0,12,0">
                                 <TextBlock FontWeight="SemiBold" Text="Date of birth" />
-                                <DatePicker Margin="0,6,0,0" SelectedDate="{Binding DateOfBirth, Mode=TwoWay}" />
+                                <DatePicker Style="{StaticResource DatePickerInputStyle}" Margin="0,6,0,0" SelectedDate="{Binding DateOfBirth, Mode=TwoWay}" />
                             </StackPanel>
                             <StackPanel Margin="12,0,0,0">
                                 <TextBlock FontWeight="SemiBold" Text="Sex" />
                                 <ComboBox Margin="0,6,0,0"
-                                          Height="36"
+                                          Style="{StaticResource ComboInputStyle}"
                                           ItemsSource="{Binding SexOptions}"
                                           SelectedItem="{Binding SelectedSex, Mode=TwoWay}" />
                             </StackPanel>
@@ -70,62 +69,60 @@
                         <UniformGrid Columns="2" Margin="0,0,0,18">
                             <StackPanel Margin="0,0,12,0">
                                 <TextBlock FontWeight="SemiBold" Text="National ID number" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding NationalIdNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding NationalIdNumber, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                             <StackPanel Margin="12,0,0,0">
                                 <TextBlock FontWeight="SemiBold" Text="Passport number" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding PassportNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding PassportNumber, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </UniformGrid>
 
                         <TextBlock Margin="0,0,0,6" FontSize="16" FontWeight="SemiBold" Text="Address" />
-                        <TextBox Height="36" Margin="0,0,0,10" Text="{Binding AddressLine1, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBox Height="36" Margin="0,0,0,10" Text="{Binding AddressLine2, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Style="{StaticResource TextInputStyle}" Margin="0,0,0,10" Text="{Binding AddressLine1, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Style="{StaticResource TextInputStyle}" Margin="0,0,0,10" Text="{Binding AddressLine2, UpdateSourceTrigger=PropertyChanged}" />
                         <UniformGrid Columns="2" Margin="0,0,0,18">
-                            <TextBox Margin="0,0,12,0" Height="36" Text="{Binding Suburb, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBox Margin="12,0,0,0" Height="36" Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Margin="0,0,12,0" Style="{StaticResource TextInputStyle}" Text="{Binding Suburb, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Margin="12,0,0,0" Style="{StaticResource TextInputStyle}" Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" />
                         </UniformGrid>
 
                         <TextBlock Margin="0,0,0,6" FontSize="16" FontWeight="SemiBold" Text="Next of kin" />
                         <UniformGrid Columns="2" Margin="0,0,0,18">
                             <StackPanel Margin="0,0,12,0">
                                 <TextBlock FontWeight="SemiBold" Text="Full name" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding NextOfKinName, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding NextOfKinName, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                             <StackPanel Margin="12,0,0,0">
                                 <TextBlock FontWeight="SemiBold" Text="Relationship" />
-                                <TextBox Height="36" Margin="0,6,0,0" Text="{Binding NextOfKinRelationship, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding NextOfKinRelationship, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </UniformGrid>
                         <StackPanel Margin="0,0,0,18">
                             <TextBlock FontWeight="SemiBold" Text="Next of kin phone number" />
-                            <TextBox Height="36" Margin="0,6,0,0" Text="{Binding NextOfKinPhoneNumber, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Style="{StaticResource TextInputStyle}" Margin="0,6,0,0" Text="{Binding NextOfKinPhoneNumber, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
 
                 <StackPanel Grid.Row="3">
                     <Border Padding="12"
+                            Style="{StaticResource StatusMessageBorderStyle}"
                             Background="{Binding StatusIsError, Converter={StaticResource RegistrationStatusBackgroundConverter}}"
                             CornerRadius="12">
                         <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
                     </Border>
                     <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
                         <Button Width="140"
-                                Height="40"
-                                Background="#0E7490"
-                                Foreground="White"
-                                BorderBrush="#0E7490"
+                                Style="{StaticResource PrimaryButtonStyle}"
                                 Command="{Binding SaveCommand}"
                                 Content="Save patient" />
                         <Button Width="140"
-                                Height="40"
                                 Margin="12,0,0,0"
+                                Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding CheckDuplicatesCommand}"
                                 Content="Check duplicates" />
                         <Button Width="120"
-                                Height="40"
                                 Margin="12,0,0,0"
+                                Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding ClearFormCommand}"
                                 Content="Clear form" />
                     </StackPanel>
@@ -134,11 +131,7 @@
         </Border>
 
         <Border Grid.Column="2"
-                Padding="20"
-                Background="White"
-                BorderBrush="#D8DEE4"
-                BorderThickness="1"
-                CornerRadius="18">
+                Style="{StaticResource CardBorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -147,19 +140,17 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel>
-                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Duplicate review" />
+                    <TextBlock Style="{StaticResource SectionTitleTextStyle}" Text="Duplicate review" />
                     <TextBlock Margin="0,8,0,0"
-                               Foreground="#5C6670"
+                               Style="{StaticResource SubtleTextStyle}"
                                Text="Warnings appear here before saving so reception staff can stop duplicate creation early."
-                               TextWrapping="Wrap" />
+                               />
                 </StackPanel>
 
                 <Grid Grid.Row="1">
-                    <TextBlock Visibility="{Binding HasDuplicateWarnings, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                               Foreground="#6B7280"
-                               VerticalAlignment="Center"
-                               Text="No duplicate warnings yet. Capture the patient details and use Check duplicates or Save patient." 
-                               TextWrapping="Wrap" />
+                    <controls:EmptyStateView Visibility="{Binding HasDuplicateWarnings, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                             Title="No duplicate warnings"
+                                             Message="Capture the patient details and use Check duplicates or Save patient." />
 
                     <ListBox ItemsSource="{Binding DuplicateWarnings}"
                              Visibility="{Binding HasDuplicateWarnings, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -171,7 +162,7 @@
                                         Padding="12"
                                         BorderBrush="#E2A93B"
                                         BorderThickness="1"
-                                        Background="#FFF9EC"
+                                        Background="{StaticResource WarningSurfaceBrush}"
                                         CornerRadius="12">
                                     <StackPanel>
                                         <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}" />
@@ -179,7 +170,7 @@
                                         <TextBlock Text="{Binding DateOfBirth, StringFormat=DOB: {0}}" />
                                         <TextBlock Text="{Binding Strength, StringFormat=Strength: {0}}" />
                                         <TextBlock Text="{Binding Recommendation, StringFormat=Action: {0}}" />
-                                        <TextBlock Margin="0,8,0,0" Foreground="#92400E" Text="{Binding ReasonSummary}" TextWrapping="Wrap" />
+                                        <TextBlock Margin="0,8,0,0" Foreground="{StaticResource WarningBrush}" Text="{Binding ReasonSummary}" TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -195,4 +186,3 @@
         </Border>
     </Grid>
 </UserControl>
-
