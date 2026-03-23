@@ -2,7 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ClinicAdmin.Contracts\ClinicAdmin.Contracts.csproj" />
     <ProjectReference Include="..\ClinicAdmin.Domain\ClinicAdmin.Domain.csproj" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 </Project>

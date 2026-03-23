@@ -85,7 +85,7 @@ public sealed class AuditService : IAuditService
             action,
             entityName,
             entityId,
-            Sanitize(details),
+            Sanitize(details) ?? string.Empty,
             beforeSummary,
             afterSummary,
             metadata,

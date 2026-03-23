@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 using ClinicAdmin.Contracts.Reports;
 
@@ -14,7 +15,7 @@ public sealed class ReportExportService : IReportExportService
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "ClinicAdmin",
                 "Exports")
-            : exportRootDirectory;
+            : exportRootDirectory.Trim();
     }
 
     public async Task<string> ExportOperationalReportCsvAsync(ClinicOperationalReportDto report, CancellationToken cancellationToken = default)

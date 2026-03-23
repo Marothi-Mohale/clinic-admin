@@ -1,4 +1,5 @@
 using ClinicAdmin.Application.Common.Validation;
+using ClinicAdmin.Application.Abstractions;
 using ClinicAdmin.Application.Authentication;
 using ClinicAdmin.Application.Authorization;
 using ClinicAdmin.Application.Patients.Commands.RegisterPatient;

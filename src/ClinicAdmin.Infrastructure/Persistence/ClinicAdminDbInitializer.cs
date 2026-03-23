@@ -1,5 +1,6 @@
 using ClinicAdmin.Application.Abstractions;
 using ClinicAdmin.Domain.Security;
+using ClinicAdmin.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -81,7 +82,7 @@ public sealed class ClinicAdminDbInitializer
         var pendingMigrations = await _dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
         if (!pendingMigrations.Any())
         {
-            var availableMigrations = await _dbContext.Database.GetMigrationsAsync(cancellationToken);
+            var availableMigrations = _dbContext.Database.GetMigrations();
             if (!availableMigrations.Any())
             {
                 throw new InvalidOperationException(

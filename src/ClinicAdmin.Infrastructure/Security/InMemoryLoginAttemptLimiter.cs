@@ -53,7 +53,7 @@ public sealed class InMemoryLoginAttemptLimiter : ILoginAttemptLimiter
     private FailureState CreateInitialState(DateTimeOffset now)
     {
         var count = 1;
-        var lockedUntilUtc = count >= _options.MaxFailedAttempts
+        DateTimeOffset? lockedUntilUtc = count >= _options.MaxFailedAttempts
             ? now.AddMinutes(_options.LockoutDurationMinutes)
             : null;
 
@@ -63,7 +63,7 @@ public sealed class InMemoryLoginAttemptLimiter : ILoginAttemptLimiter
     private FailureState UpdateState(FailureState existing, DateTimeOffset now)
     {
         var count = existing.Count + 1;
-        var lockedUntilUtc = count >= _options.MaxFailedAttempts
+        DateTimeOffset? lockedUntilUtc = count >= _options.MaxFailedAttempts
             ? now.AddMinutes(_options.LockoutDurationMinutes)
             : existing.LockedUntilUtc;
 
