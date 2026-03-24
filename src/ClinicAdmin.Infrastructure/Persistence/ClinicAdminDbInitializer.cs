@@ -32,6 +32,7 @@ public sealed class ClinicAdminDbInitializer
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         await InitializeDatabaseAsync(cancellationToken);
+        await EnsureAdminUserAsync(cancellationToken);
 
         if (!_seedingOptions.SeedDefaultUsers)
         {
@@ -40,7 +41,6 @@ public sealed class ClinicAdminDbInitializer
         }
 
         var hasExistingUsers = await _dbContext.Users.AnyAsync(x => x.FacilityId == _facilityContext.CurrentFacilityId, cancellationToken);
-        await EnsureAdminUserAsync(cancellationToken);
 
         if (hasExistingUsers)
         {
@@ -104,6 +104,11 @@ public sealed class ClinicAdminDbInitializer
         if (_dbContext.Database.IsSqlite() || _dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
         {
             await _dbContext.Database.EnsureCreatedAsync(cancellationToken);
+            if (_dbContext.Database.IsSqlite())
+            {
+                await EnsureSqliteUserSchemaCompatibilityAsync(cancellationToken);
+            }
+
             return;
         }
 
@@ -119,5 +124,29 @@ public sealed class ClinicAdminDbInitializer
         }
 
         await _dbContext.Database.MigrateAsync(cancellationToken);
+    }
+
+    private async Task EnsureSqliteUserSchemaCompatibilityAsync(CancellationToken cancellationToken)
+    {
+        var sqlStatements = new[]
+        {
+            "ALTER TABLE Users ADD COLUMN FileNumber TEXT NULL;",
+            "ALTER TABLE Users ADD COLUMN IdNumber TEXT NULL;",
+            "ALTER TABLE Users ADD COLUMN Email TEXT NULL;",
+            "ALTER TABLE Users ADD COLUMN IsIdentityConfirmed INTEGER NOT NULL DEFAULT 1;",
+            "CREATE UNIQUE INDEX IF NOT EXISTS IX_Users_FacilityId_FileNumber ON Users(FacilityId, FileNumber) WHERE FileNumber IS NOT NULL;"
+        };
+
+        foreach (var statement in sqlStatements)
+        {
+            try
+            {
+                await _dbContext.Database.ExecuteSqlRawAsync(statement, cancellationToken);
+            }
+            catch (Exception ex) when (ex.Message.Contains("duplicate column name", StringComparison.OrdinalIgnoreCase))
+            {
+                // Existing local SQLite files may already have these columns.
+            }
+        }
     }
 }
