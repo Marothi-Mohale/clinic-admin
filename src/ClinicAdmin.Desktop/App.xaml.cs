@@ -15,6 +15,7 @@ public partial class App : System.Windows.Application
 {
     private readonly IHost _host;
     private IServiceScope? _uiScope;
+    private static readonly string? EnvironmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
 
     public App()
     {
@@ -23,7 +24,11 @@ public partial class App : System.Windows.Application
             {
                 builder.SetBasePath(AppContext.BaseDirectory);
                 builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                builder.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environments.Production}.json", optional: true, reloadOnChange: true);
+                if (!string.IsNullOrWhiteSpace(EnvironmentName))
+                {
+                    builder.AddJsonFile($"appsettings.{EnvironmentName}.json", optional: true, reloadOnChange: true);
+                }
+
                 builder.AddEnvironmentVariables(prefix: "CLINICADMIN_");
             })
             .UseSerilog((context, _, loggerConfiguration) =>
@@ -31,7 +36,7 @@ public partial class App : System.Windows.Application
                 loggerConfiguration
                     .ReadFrom.Configuration(context.Configuration)
                     .Enrich.WithProperty("Application", "ClinicAdmin")
-                    .Enrich.WithProperty("Environment", Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? Environments.Production);
+                    .Enrich.WithProperty("Environment", EnvironmentName ?? "Default");
             })
             .ConfigureServices((context, services) =>
             {
