@@ -82,20 +82,86 @@
                         Padding="36"
                         VerticalAlignment="Center">
                     <StackPanel>
-                        <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Sign in" />
-                        <TextBlock Margin="0,8,0,0" Style="{StaticResource SubtleTextStyle}" Text="Secure access for clinic staff" />
+                        <TextBlock Style="{StaticResource PageTitleTextStyle}" Text="Account access" />
+                        <TextBlock Margin="0,8,0,0" Style="{StaticResource SubtleTextStyle}" Text="Sign in or create a tracked account" />
 
-                        <TextBlock Margin="0,24,0,6" FontWeight="SemiBold" Text="Username" />
-                        <TextBox Style="{StaticResource TextInputStyle}"
-                                 Text="{Binding Login.Username, UpdateSourceTrigger=PropertyChanged}" />
+                        <StackPanel Visibility="{Binding Login.IsRegistrationMode, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                            <TextBlock Margin="0,24,0,6" FontWeight="SemiBold" Text="Username" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.Username, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Margin="0,16,0,6" FontWeight="SemiBold" Text="Password" />
-                        <PasswordBox x:Name="PasswordInput"
-                                     Height="38"
-                                     Padding="12,7"
-                                     BorderBrush="{StaticResource BorderBrushNeutral}"
-                                     BorderThickness="1"
-                                     PasswordChanged="PasswordInput_OnPasswordChanged" />
+                            <TextBlock Margin="0,16,0,6" FontWeight="SemiBold" Text="Password" />
+                            <PasswordBox x:Name="PasswordInput"
+                                         Height="38"
+                                         Padding="12,7"
+                                         BorderBrush="{StaticResource BorderBrushNeutral}"
+                                         BorderThickness="1"
+                                         PasswordChanged="PasswordInput_OnPasswordChanged" />
+
+                            <Button Margin="0,24,0,0"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding Login.LoginCommand}"
+                                    Content="Sign in" />
+
+                            <Button Margin="0,10,0,0"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding Login.OpenRegistrationCommand}"
+                                    Content="Create account" />
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding Login.IsRegistrationMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Margin="0,24,0,6" FontWeight="SemiBold" Text="File Number" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.RegisterFileNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Username" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.RegisterUsername, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Password" />
+                            <PasswordBox x:Name="RegisterPasswordInput"
+                                         Height="38"
+                                         Padding="12,7"
+                                         BorderBrush="{StaticResource BorderBrushNeutral}"
+                                         BorderThickness="1"
+                                         PasswordChanged="RegisterPasswordInput_OnPasswordChanged" />
+
+                            <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="ID Number" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.RegisterIdNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Confirm ID Number" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.RegisterConfirmedIdNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Email" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.RegisterEmail, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Confirm Email" />
+                            <TextBox Style="{StaticResource TextInputStyle}"
+                                     Text="{Binding Login.RegisterConfirmedEmail, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <Button Margin="0,20,0,0"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding Login.RegisterCommand}"
+                                    Content="Register account" />
+
+                            <Button Margin="0,10,0,0"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding Login.CancelRegistrationCommand}"
+                                    Content="Back to sign in" />
+                        </StackPanel>
+
+                        <Border Margin="0,16,0,0"
+                                Padding="10"
+                                Background="{StaticResource WarningSurfaceBrush}"
+                                BorderBrush="{StaticResource WarningBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Visibility="{Binding Login.StatusMessage, Converter={StaticResource StringToVisibilityConverter}}">
+                            <TextBlock Foreground="{StaticResource WarningBrush}" Text="{Binding Login.StatusMessage}" TextWrapping="Wrap" />
+                        </Border>
 
                         <Border Margin="0,16,0,0"
                                 Padding="10"
@@ -106,11 +172,6 @@
                                 Visibility="{Binding Login.ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
                             <TextBlock Foreground="{StaticResource DangerBrush}" Text="{Binding Login.ErrorMessage}" TextWrapping="Wrap" />
                         </Border>
-
-                        <Button Margin="0,24,0,0"
-                                Style="{StaticResource PrimaryButtonStyle}"
-                                Command="{Binding Login.LoginCommand}"
-                                Content="Sign in" />
                     </StackPanel>
                 </Border>
             </Grid>

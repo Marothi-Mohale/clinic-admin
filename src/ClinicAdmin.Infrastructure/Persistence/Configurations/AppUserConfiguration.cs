@@ -12,11 +12,16 @@ public sealed class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Username).HasMaxLength(50).IsRequired();
         builder.Property(x => x.DisplayName).HasMaxLength(150).IsRequired();
+        builder.Property(x => x.FileNumber).HasMaxLength(50);
+        builder.Property(x => x.IdNumber).HasMaxLength(30);
+        builder.Property(x => x.Email).HasMaxLength(200);
+        builder.Property(x => x.IsIdentityConfirmed).IsRequired();
         builder.Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
         builder.Property(x => x.PasswordSalt).HasMaxLength(256).IsRequired();
         builder.Property(x => x.Role).HasConversion<string>().HasMaxLength(30).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
         builder.HasIndex(x => new { x.FacilityId, x.Username }).IsUnique();
+        builder.HasIndex(x => new { x.FacilityId, x.FileNumber }).IsUnique();
     }
 }
 

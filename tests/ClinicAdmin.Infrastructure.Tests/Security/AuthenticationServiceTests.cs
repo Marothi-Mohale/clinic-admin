@@ -135,6 +135,50 @@ public sealed class AuthenticationServiceTests
         Assert.Equal(AuthenticationErrorCode.LockedOut, lockedOutAttempt.ErrorCode);
     }
 
+    [Fact]
+    public async Task RegisterAccountAsync_WithMatchingIdAndEmail_ShouldCreateUser()
+    {
+        await using var dbContext = CreateDbContext();
+        var passwordHasher = new Pbkdf2PasswordHasher();
+        var authService = CreateAuthenticationService(dbContext, passwordHasher, new UserSessionService());
+
+        var result = await authService.RegisterAccountAsync(
+            fileNumber: "F-1001",
+            username: "newuser",
+            password: "Pa$$w0rd",
+            idNumber: "9001015009087",
+            email: "newuser@clinic.local",
+            confirmedIdNumber: "9001015009087",
+            confirmedEmail: "newuser@clinic.local");
+
+        Assert.True(result.Succeeded);
+        var user = Assert.Single(dbContext.Users);
+        Assert.Equal("NEWUSER", user.Username);
+        Assert.Equal("F-1001", user.FileNumber);
+        Assert.True(user.IsIdentityConfirmed);
+    }
+
+    [Fact]
+    public async Task RegisterAccountAsync_WithMismatchedEmail_ShouldFailValidation()
+    {
+        await using var dbContext = CreateDbContext();
+        var passwordHasher = new Pbkdf2PasswordHasher();
+        var authService = CreateAuthenticationService(dbContext, passwordHasher, new UserSessionService());
+
+        var result = await authService.RegisterAccountAsync(
+            fileNumber: "F-1001",
+            username: "newuser",
+            password: "Pa$$w0rd",
+            idNumber: "9001015009087",
+            email: "newuser@clinic.local",
+            confirmedIdNumber: "9001015009087",
+            confirmedEmail: "other@clinic.local");
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(AuthenticationErrorCode.ValidationFailed, result.ErrorCode);
+        Assert.Empty(dbContext.Users);
+    }
+
     private ClinicAdminDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ClinicAdminDbContext>()
@@ -168,6 +212,7 @@ public sealed class AuthenticationServiceTests
             facilityContext,
             loginAttemptLimiter ?? CreateLimiter(),
             new ValidatorExecutor<LoginRequest>(new[] { new LoginRequestValidator() }),
+            new ValidatorExecutor<RegisterAccountRequest>(new[] { new RegisterAccountRequestValidator() }),
             NullLogger<AuthenticationService>.Instance);
     }
 

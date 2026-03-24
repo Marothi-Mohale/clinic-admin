@@ -7,5 +7,7 @@ public enum AuthenticationErrorCode
     InvalidCredentials = 2,
     UserInactive = 3,
     UnexpectedError = 4,
-    LockedOut = 5
+    LockedOut = 5,
+    UsernameTaken = 6,
+    IdentityNotConfirmed = 7
 }

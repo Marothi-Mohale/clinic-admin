@@ -139,6 +139,17 @@ public sealed class MainWindowViewModelTests
         public Task<AuthenticationResult> LoginAsync(string username, string password, CancellationToken cancellationToken = default) =>
             Task.FromResult(AuthenticationResult.Failure(AuthenticationErrorCode.InvalidCredentials, "Not implemented for this test."));
 
+        public Task<AuthenticationResult> RegisterAccountAsync(
+            string fileNumber,
+            string username,
+            string password,
+            string idNumber,
+            string email,
+            string confirmedIdNumber,
+            string confirmedEmail,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new AuthenticationResult(true, AuthenticationErrorCode.None, "Registered."));
+
         public Task LogoutAsync(CancellationToken cancellationToken = default)
         {
             _sessionService.ClearSession();

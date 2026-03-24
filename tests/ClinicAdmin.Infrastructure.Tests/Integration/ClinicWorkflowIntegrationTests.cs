@@ -15,6 +15,7 @@ using ClinicAdmin.Infrastructure.Sync;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace ClinicAdmin.Infrastructure.Tests.Integration;
 
@@ -58,7 +59,9 @@ public sealed class ClinicWorkflowIntegrationTests
             auditService,
             clock,
             facilityContext,
+            new InMemoryLoginAttemptLimiter(Options.Create(new Infrastructure.Configuration.AuthenticationOptions())),
             new ValidatorExecutor<LoginRequest>(new[] { new LoginRequestValidator() }),
+            new ValidatorExecutor<RegisterAccountRequest>(new[] { new RegisterAccountRequestValidator() }),
             NullLogger<AuthenticationService>.Instance);
 
         var loginResult = await authenticationService.LoginAsync("reception", "Reception@123");

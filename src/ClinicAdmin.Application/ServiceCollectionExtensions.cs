@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped(typeof(ValidatorExecutor<>));
         services.AddSingleton<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
+        services.AddScoped<IValidator<RegisterAccountRequest>, RegisterAccountRequestValidator>();
         services.AddScoped<IValidator<RegisterPatientCommand>, RegisterPatientCommandValidator>();
         services.AddScoped<IValidator<RegisterVisitCommand>, RegisterVisitCommandValidator>();
         services.AddScoped<IValidator<UpdateVisitStateCommand>, UpdateVisitStateCommandValidator>();

