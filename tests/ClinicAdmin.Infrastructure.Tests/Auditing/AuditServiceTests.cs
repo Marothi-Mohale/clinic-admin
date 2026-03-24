@@ -57,9 +57,8 @@ public sealed class AuditServiceTests
             Username = username;
         }
 
-        public string? Username { get; }
-        public Guid? UserId => Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-        public bool IsAuthenticated => true;
+        public string Username { get; }
+        public IReadOnlyCollection<string> Roles => ["RECEPTIONIST"];
     }
 
     private sealed class FakeFacilityContext : IFacilityContext

@@ -55,7 +55,19 @@ public sealed class PatientSearchServiceTests
         dbContext.Patients.Add(patient);
         await dbContext.SaveChangesAsync();
         dbContext.Files.Add(new FileRecord(patient.Id, _facilityId, "F-100"));
-        dbContext.AuditEntries.Add(new ClinicAdmin.Domain.Auditing.AuditEntry(_facilityId, "RECEPTION", "PatientRegistered", nameof(Patient), patient.Id, "Patient registered", true, DateTimeOffset.UtcNow));
+        dbContext.AuditEntries.Add(new ClinicAdmin.Domain.Auditing.AuditEntry(
+            _facilityId,
+            "RECEPTION",
+            "PatientRegistered",
+            nameof(Patient),
+            patient.Id,
+            "Patient registered",
+            null,
+            null,
+            null,
+            null,
+            true,
+            DateTimeOffset.UtcNow));
         await dbContext.SaveChangesAsync();
 
         var service = new PatientSearchService(dbContext);

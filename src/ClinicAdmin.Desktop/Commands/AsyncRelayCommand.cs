@@ -33,6 +33,10 @@ public sealed class AsyncRelayCommand : ICommand
         {
             await _executeAsync();
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError($"Async command execution failed: {ex}");
+        }
         finally
         {
             _isExecuting = false;

@@ -28,7 +28,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         Assert.Equal(DuplicateActionRecommendation.BlockCreation, result.Recommendation);
         Assert.Single(result.Matches);
-        Assert.Contains(DuplicateMatchReason.ExactNationalId, result.Matches[0].Reasons);
+        Assert.Contains(DuplicateMatchReason.ExactNationalId, result.Matches.First().Reasons);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class PatientDuplicateDetectionServiceTests
         var result = _service.Detect(request, candidates);
 
         Assert.Equal(DuplicateActionRecommendation.BlockCreation, result.Recommendation);
-        Assert.Contains(DuplicateMatchReason.ExactPassportNumber, result.Matches[0].Reasons);
+        Assert.Contains(DuplicateMatchReason.ExactPassportNumber, result.Matches.First().Reasons);
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public sealed class PatientDuplicateDetectionServiceTests
         var result = _service.Detect(request, candidates);
 
         Assert.Equal(DuplicateActionRecommendation.RequireManualReview, result.Recommendation);
-        Assert.Contains(DuplicateMatchReason.ExactPhoneNumber, result.Matches[0].Reasons);
-        Assert.Contains(DuplicateMatchReason.ExactSurnameAndDateOfBirth, result.Matches[0].Reasons);
+        Assert.Contains(DuplicateMatchReason.ExactPhoneNumber, result.Matches.First().Reasons);
+        Assert.Contains(DuplicateMatchReason.ExactSurnameAndDateOfBirth, result.Matches.First().Reasons);
     }
 
     [Fact]
@@ -98,8 +98,8 @@ public sealed class PatientDuplicateDetectionServiceTests
         var result = _service.Detect(request, candidates);
 
         Assert.Equal(DuplicateActionRecommendation.RequireManualReview, result.Recommendation);
-        Assert.Contains(DuplicateMatchReason.ExactSurnameAndDateOfBirth, result.Matches[0].Reasons);
-        Assert.Contains(DuplicateMatchReason.SimilarFirstName, result.Matches[0].Reasons);
+        Assert.Contains(DuplicateMatchReason.ExactSurnameAndDateOfBirth, result.Matches.First().Reasons);
+        Assert.Contains(DuplicateMatchReason.SimilarFirstName, result.Matches.First().Reasons);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public sealed class PatientDuplicateDetectionServiceTests
 
         Assert.Equal(DuplicateActionRecommendation.ShowWarning, result.Recommendation);
         Assert.Single(result.Matches);
-        Assert.Contains(DuplicateMatchReason.ExactFullName, result.Matches[0].Reasons);
+        Assert.Contains(DuplicateMatchReason.ExactFullName, result.Matches.First().Reasons);
     }
 
     [Fact]

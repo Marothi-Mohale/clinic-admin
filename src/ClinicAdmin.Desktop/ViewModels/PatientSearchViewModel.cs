@@ -91,39 +91,50 @@ public sealed class PatientSearchViewModel : ViewModelBase
 
         await ExecuteBusyAsync(async () =>
         {
-            Results.Clear();
-            SelectedResult = null;
-            SelectedProfile.Reset();
-
-            var results = await _patientSearchService.SearchAsync(new SearchPatientsQuery(_facilityContext.CurrentFacilityId, SearchTerm, 0, 25));
-
-            foreach (var result in results)
+            try
             {
-                Results.Add(new PatientSearchResultItemViewModel
+                Results.Clear();
+                SelectedResult = null;
+                SelectedProfile.Reset();
+
+                var results = await _patientSearchService.SearchAsync(new SearchPatientsQuery(_facilityContext.CurrentFacilityId, SearchTerm, 0, 25));
+
+                foreach (var result in results)
                 {
-                    Id = result.Id,
-                    PatientNumber = result.PatientNumber,
-                    DisplayName = result.DisplayName,
-                    DateOfBirth = result.DateOfBirth,
-                    NationalIdNumber = result.NationalIdNumber,
-                    PassportNumber = result.PassportNumber,
-                    PhoneNumber = result.PhoneNumber,
-                    FileNumber = result.FileNumber,
-                    FileStatus = result.FileStatus,
-                    FileLocation = result.FileLocation
-                });
+                    Results.Add(new PatientSearchResultItemViewModel
+                    {
+                        Id = result.Id,
+                        PatientNumber = result.PatientNumber,
+                        DisplayName = result.DisplayName,
+                        DateOfBirth = result.DateOfBirth,
+                        NationalIdNumber = result.NationalIdNumber,
+                        PassportNumber = result.PassportNumber,
+                        PhoneNumber = result.PhoneNumber,
+                        FileNumber = result.FileNumber,
+                        FileStatus = result.FileStatus,
+                        FileLocation = result.FileLocation
+                    });
+                }
+
+                RaisePropertyChanged(nameof(HasResults));
+
+                if (results.Count == 0)
+                {
+                    StatusMessage = $"No patients were found for \"{SearchTerm}\". Check the spelling or try a different identifier.";
+                    return;
+                }
+
+                StatusMessage = $"{results.Count} patient result(s) found. Select a result to view the profile summary.";
+                firstResult = Results[0];
             }
-
-            RaisePropertyChanged(nameof(HasResults));
-
-            if (results.Count == 0)
+            catch (Exception)
             {
-                StatusMessage = $"No patients were found for \"{SearchTerm}\". Check the spelling or try a different identifier.";
-                return;
+                Results.Clear();
+                SelectedResult = null;
+                SelectedProfile.Reset();
+                StatusMessage = "Patient search is temporarily unavailable. Please retry.";
+                RaisePropertyChanged(nameof(HasResults));
             }
-
-            StatusMessage = $"{results.Count} patient result(s) found. Select a result to view the profile summary.";
-            firstResult = Results[0];
         });
 
         if (firstResult is not null)
@@ -146,39 +157,47 @@ public sealed class PatientSearchViewModel : ViewModelBase
 
         await ExecuteBusyAsync(async () =>
         {
-            var profile = await _patientSearchService.GetProfileAsync(_facilityContext.CurrentFacilityId, SelectedResult.Id);
-            if (profile is null)
+            try
+            {
+                var profile = await _patientSearchService.GetProfileAsync(_facilityContext.CurrentFacilityId, SelectedResult.Id);
+                if (profile is null)
+                {
+                    SelectedProfile.Reset();
+                    StatusMessage = "The selected patient could not be loaded. Please refresh the search results.";
+                    return;
+                }
+
+                SelectedProfile.PatientNumber = profile.PatientNumber;
+                SelectedProfile.DisplayName = $"{profile.FirstName} {profile.LastName}";
+                SelectedProfile.Summary = $"{profile.Sex} | DOB: {profile.DateOfBirth?.ToString("yyyy-MM-dd") ?? "Unknown"}";
+                SelectedProfile.FileNumber = profile.FileNumber;
+                SelectedProfile.FileStatus = profile.FileStatus;
+                SelectedProfile.FileLocation = profile.FileLocation;
+                SelectedProfile.PhoneNumber = profile.PhoneNumber;
+                SelectedProfile.NationalIdNumber = profile.NationalIdNumber;
+                SelectedProfile.PassportNumber = profile.PassportNumber;
+                SelectedProfile.Address = string.Join(", ", new[] { profile.AddressLine1, profile.AddressLine2, profile.Suburb, profile.City }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                SelectedProfile.NextOfKin = string.Join(" | ", new[] { profile.NextOfKinName, profile.NextOfKinRelationship, profile.NextOfKinPhoneNumber }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                SelectedProfile.History.Clear();
+
+                foreach (var historyItem in profile.History)
+                {
+                    SelectedProfile.History.Add(new PatientHistoryItemViewModel
+                    {
+                        OccurredAtUtc = historyItem.OccurredAtUtc,
+                        Action = historyItem.Action,
+                        Details = historyItem.Details,
+                        Succeeded = historyItem.Succeeded
+                    });
+                }
+
+                StatusMessage = $"Loaded profile for {SelectedProfile.DisplayName}.";
+            }
+            catch (Exception)
             {
                 SelectedProfile.Reset();
-                StatusMessage = "The selected patient could not be loaded. Please refresh the search results.";
-                return;
+                StatusMessage = "Patient profile loading failed. Please retry.";
             }
-
-            SelectedProfile.PatientNumber = profile.PatientNumber;
-            SelectedProfile.DisplayName = $"{profile.FirstName} {profile.LastName}";
-            SelectedProfile.Summary = $"{profile.Sex} | DOB: {profile.DateOfBirth?.ToString("yyyy-MM-dd") ?? "Unknown"}";
-            SelectedProfile.FileNumber = profile.FileNumber;
-            SelectedProfile.FileStatus = profile.FileStatus;
-            SelectedProfile.FileLocation = profile.FileLocation;
-            SelectedProfile.PhoneNumber = profile.PhoneNumber;
-            SelectedProfile.NationalIdNumber = profile.NationalIdNumber;
-            SelectedProfile.PassportNumber = profile.PassportNumber;
-            SelectedProfile.Address = string.Join(", ", new[] { profile.AddressLine1, profile.AddressLine2, profile.Suburb, profile.City }.Where(x => !string.IsNullOrWhiteSpace(x)));
-            SelectedProfile.NextOfKin = string.Join(" | ", new[] { profile.NextOfKinName, profile.NextOfKinRelationship, profile.NextOfKinPhoneNumber }.Where(x => !string.IsNullOrWhiteSpace(x)));
-            SelectedProfile.History.Clear();
-
-            foreach (var historyItem in profile.History)
-            {
-                SelectedProfile.History.Add(new PatientHistoryItemViewModel
-                {
-                    OccurredAtUtc = historyItem.OccurredAtUtc,
-                    Action = historyItem.Action,
-                    Details = historyItem.Details,
-                    Succeeded = historyItem.Succeeded
-                });
-            }
-
-            StatusMessage = $"Loaded profile for {SelectedProfile.DisplayName}.";
         });
     }
 
